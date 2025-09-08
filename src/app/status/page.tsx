@@ -1,3 +1,4 @@
+
 'use client'
 
 import { useState } from 'react'
@@ -54,8 +55,8 @@ export default function StatusPage() {
 
     // This is mock data. In a real application, you would fetch this from your backend.
     const mockData: { [key: string]: BookingResult } = {
-      'BK001': {
-        id: 'BK001',
+      'ULTRANS69904': {
+        id: 'ULTRANS69904',
         user_name: 'John',
         user_surname: 'Doe',
         user_staffno: '12345',
@@ -67,8 +68,8 @@ export default function StatusPage() {
         driver_required: 'Yes',
         status: 'Pending Admin',
       },
-      'BK002': {
-        id: 'BK002',
+      'ULTRANS12345': {
+        id: 'ULTRANS12345',
         user_name: 'Jane',
         user_surname: 'Smith',
         user_staffno: '54321',
@@ -82,23 +83,22 @@ export default function StatusPage() {
       },
     }
 
-    if (mockData[reference]) {
-      setResult(mockData[reference]);
+    if (mockData[reference.toUpperCase()]) {
+      setResult(mockData[reference.toUpperCase()]);
     } else {
       setError(`No booking found for reference number: ${reference}`);
     }
   }
   
   const getBadgeVariant = (status: string): 'destructive' | 'secondary' | 'default' | 'outline' => {
-    switch (status) {
-        case 'Rejected': return 'destructive';
-        case 'Pending Admin': return 'secondary';
-        case 'Pending Inspector': return 'secondary';
-        case 'Approved': return 'default';
-        case 'In Progress': return 'default';
-        default: return 'outline';
-    }
+    const lowerStatus = status.toLowerCase();
+    if (lowerStatus.includes('reject')) return 'destructive';
+    if (lowerStatus.includes('pending')) return 'secondary';
+    if (lowerStatus.includes('approve')) return 'default';
+    if (lowerStatus.includes('progress')) return 'default';
+    return 'outline';
   }
+
 
   return (
     <div className="container mx-auto py-10">
@@ -114,7 +114,7 @@ export default function StatusPage() {
               <Input
                 id="reference"
                 type="text"
-                placeholder="e.g., BK001"
+                placeholder="e.g., ULTRANS69904"
                 value={reference}
                 onChange={(e) => setReference(e.target.value)}
               />
@@ -131,44 +131,46 @@ export default function StatusPage() {
             <div className="w-full">
               <h4 className="text-xl font-semibold mb-4">Vehicle Request Details</h4>
               <hr className="mb-4" />
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>First Name</TableHead>
-                    <TableHead>Surname</TableHead>
-                    <TableHead>Staff No.</TableHead>
-                    <TableHead>Mobile No.</TableHead>
-                    <TableHead>Department</TableHead>
-                    <TableHead>Building</TableHead>
-                    <TableHead>Office No.</TableHead>
-                    <TableHead>Vehicle</TableHead>
-                    <TableHead>Driver Req.</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Action</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  <TableRow>
-                    <TableCell>{result.user_name}</TableCell>
-                    <TableCell>{result.user_surname}</TableCell>
-                    <TableCell>{result.user_staffno}</TableCell>
-                    <TableCell>{result.user_mobile}</TableCell>
-                    <TableCell>{result.department}</TableCell>
-                    <TableCell>{result.building}</TableCell>
-                    <TableCell>{result.officeno}</TableCell>
-                    <TableCell>{result.car_type}</TableCell>
-                    <TableCell>{result.driver_required}</TableCell>
-                    <TableCell>
-                      <Badge variant={getBadgeVariant(result.status)}>{result.status}</Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Button variant="link" className="p-0 h-auto text-destructive" onClick={() => alert('Booking cancellation action!')}>
-                        Cancel Booking
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>First Name</TableHead>
+                      <TableHead>Surname</TableHead>
+                      <TableHead>Staff No.</TableHead>
+                      <TableHead>Mobile No.</TableHead>
+                      <TableHead>Department</TableHead>
+                      <TableHead>Building</TableHead>
+                      <TableHead>Office No.</TableHead>
+                      <TableHead>Vehicle</TableHead>
+                      <TableHead>Driver Req.</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Action</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell>{result.user_name}</TableCell>
+                      <TableCell>{result.user_surname}</TableCell>
+                      <TableCell>{result.user_staffno}</TableCell>
+                      <TableCell>{result.user_mobile}</TableCell>
+                      <TableCell>{result.department}</TableCell>
+                      <TableCell>{result.building}</TableCell>
+                      <TableCell>{result.officeno}</TableCell>
+                      <TableCell>{result.car_type}</TableCell>
+                      <TableCell>{result.driver_required}</TableCell>
+                      <TableCell>
+                        <Badge variant={getBadgeVariant(result.status)}>{result.status}</Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Button variant="link" className="p-0 h-auto text-destructive" onClick={() => alert('Booking cancellation action!')}>
+                          Cancel Booking
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </div>
             </div>
           )}
         </CardContent>
