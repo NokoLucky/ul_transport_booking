@@ -1,0 +1,9 @@
+// src/lib/supabase/client.ts
+import { createClient } from '@supabase/supabase-js'
+
+// Note: These variables should be stored in environment variables
+// For local development, you can create a .env.local file
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey)
