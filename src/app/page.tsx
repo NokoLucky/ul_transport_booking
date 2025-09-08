@@ -33,6 +33,11 @@ export default function HomePage() {
             <Link href="/status">Check Status</Link>
           </Button>
         </div>
+         <div className="absolute bottom-16">
+          <Button asChild variant="ghost" className="text-gray-300 hover:text-white hover:bg-white/10">
+            <Link href="/login">Staff Login</Link>
+          </Button>
+        </div>
       </div>
       <footer className="absolute bottom-0 z-10 w-full p-4 text-center text-xs text-gray-400">
         <p>&copy; {new Date().getFullYear()} University of Limpopo. All rights reserved.</p>
