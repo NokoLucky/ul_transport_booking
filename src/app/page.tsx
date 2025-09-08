@@ -29,7 +29,7 @@ export default function HomePage() {
           <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90">
             <Link href="/login">Book Your Ride</Link>
           </Button>
-          <Button asChild size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
+          <Button asChild size="lg" variant="outline" className="border-white bg-transparent text-white hover:bg-white/10">
             <Link href="/dashboard">Go to Dashboard</Link>
           </Button>
         </div>
