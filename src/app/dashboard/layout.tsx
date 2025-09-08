@@ -1,6 +1,7 @@
-import { SidebarProvider, Sidebar, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
-import { AppSidebar } from "@/components/dashboard/AppSidebar"
+import { TopNav } from "@/components/dashboard/TopNav"
 import { UserNav } from "@/components/dashboard/UserNav"
+import { Bus } from 'lucide-react'
+import Link from 'next/link'
 
 export default function DashboardLayout({
   children,
@@ -8,24 +9,22 @@ export default function DashboardLayout({
   children: React.ReactNode
 }) {
   return (
-    <SidebarProvider>
-      <div className="min-h-screen w-full">
-        <Sidebar collapsible="icon">
-          <AppSidebar />
-        </Sidebar>
-        <SidebarInset className="flex flex-col !min-h-screen">
-          <header className="flex h-14 items-center gap-4 border-b bg-background/95 backdrop-blur-sm px-4 lg:h-[60px] lg:px-6 sticky top-0 z-10">
-            <SidebarTrigger className="md:hidden" />
-            <div className="flex-1">
-                {/* Future home for breadcrumbs or page titles */}
+      <div className="min-h-screen w-full flex flex-col">
+          <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
+            <Link href="/dashboard" className="flex items-center gap-2" title="LimpopoRide Home">
+                <Bus className="size-8 text-primary" />
+                <h1 className="text-2xl font-semibold font-headline hidden sm:block">LimpopoRide</h1>
+            </Link>
+
+            <TopNav />
+            
+            <div className="ml-auto">
+                <UserNav />
             </div>
-            <UserNav />
           </header>
           <main className="flex-1 p-4 sm:p-6 bg-muted/40">
             {children}
           </main>
-        </SidebarInset>
       </div>
-    </SidebarProvider>
   )
 }

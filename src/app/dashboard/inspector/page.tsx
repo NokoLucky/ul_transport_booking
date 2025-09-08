@@ -51,7 +51,6 @@ export default function InspectorDashboard() {
 
   return (
     <div className="space-y-6">
-      <h1 className="font-headline text-3xl font-bold">Inspection Queue</h1>
       
       <Card>
         <CardHeader>

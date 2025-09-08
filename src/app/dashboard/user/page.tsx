@@ -64,7 +64,6 @@ export default function UserDashboard() {
 
   return (
     <div className="space-y-6">
-      <h1 className="font-headline text-3xl font-bold">My Dashboard</h1>
      <Card>
         <CardHeader className="flex flex-row items-center">
             <div className="grid gap-2">
