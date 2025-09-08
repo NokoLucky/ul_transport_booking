@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, ClipboardList, PanelLeft, Settings, LogOut } from 'lucide-react'
+import { PanelLeft, Settings, LogOut } from 'lucide-react'
 import {
   Sheet,
   SheetContent,
@@ -18,8 +18,8 @@ const useRole = () => {
 }
 
 const userNav = [
-  { href: '/dashboard/user', label: 'My Dashboard' },
   { href: '/dashboard/user/bookings/new', label: 'New Booking' },
+  { href: '/status', label: 'Check Status' },
 ];
 
 const inspectorNav = [
@@ -54,7 +54,7 @@ export function TopNav() {
                 <Button
                     variant="outline"
                     size="icon"
-                    className="shrink-0 md:hidden"
+                    className="shrink-0 md:hidden ml-auto"
                 >
                     <PanelLeft className="h-5 w-5" />
                     <span className="sr-only">Toggle navigation menu</span>
@@ -77,13 +77,6 @@ export function TopNav() {
                     >
                         <Settings className="h-5 w-5" />
                         Settings
-                    </Link>
-                     <Link
-                        href="/login"
-                        className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
-                    >
-                        <LogOut className="h-5 w-5" />
-                        Logout
                     </Link>
                 </nav>
             </SheetContent>

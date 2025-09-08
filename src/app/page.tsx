@@ -27,10 +27,10 @@ export default function HomePage() {
         </p>
         <div className="mt-8 flex gap-4">
           <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90">
-            <Link href="/login">Book Your Ride</Link>
+            <Link href="/dashboard/user/bookings/new">Book Your Ride</Link>
           </Button>
           <Button asChild size="lg" variant="outline" className="border-white bg-transparent text-white hover:bg-white/10">
-            <Link href="/dashboard">Go to Dashboard</Link>
+            <Link href="/status">Check Status</Link>
           </Button>
         </div>
       </div>
