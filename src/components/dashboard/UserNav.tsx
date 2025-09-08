@@ -56,7 +56,7 @@ export function UserNav() {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <Link href="/login" legacyBehavior passHref>
+        <Link href="/login">
           <DropdownMenuItem>
               Log out
           </DropdownMenuItem>
