@@ -29,7 +29,7 @@ export default function NewBookingPage() {
             <CardHeader>
             <CardTitle className="font-headline text-2xl">Trip Details</CardTitle>
             <CardDescription>
-                Please fill out the form below to request a vehicle. All fields are required.
+                Please fill out the form below to request a vehicle. All fields are required unless marked optional.
             </CardDescription>
             </CardHeader>
             <CardContent>
@@ -39,3 +39,5 @@ export default function NewBookingPage() {
     </div>
   )
 }
+
+    
