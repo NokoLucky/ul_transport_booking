@@ -106,11 +106,13 @@ export function BookingForm() {
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values)
+    // In a real app, you would save the booking and get an ID
+    const mockBookingId = "BK" + Math.floor(Math.random() * 1000);
     toast({
-      title: "Booking Submitted!",
-      description: "Your vehicle request has been sent for approval.",
+      title: "Booking Details Saved!",
+      description: "Please upload the required documents to finalize your request.",
     })
-    router.push('/dashboard/user');
+    router.push(`/dashboard/user/bookings/${mockBookingId}/upload`);
   }
 
   return (
@@ -306,11 +308,9 @@ export function BookingForm() {
         
         <div className="flex justify-end pt-4 gap-4">
             <Button type="button" variant="outline" onClick={() => router.back()}>Back</Button>
-            <Button type="submit">Submit Booking Request</Button>
+            <Button type="submit">Submit & Continue to Uploads</Button>
         </div>
       </form>
     </Form>
   )
 }
-
-    

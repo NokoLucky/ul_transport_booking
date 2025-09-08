@@ -18,6 +18,7 @@ const useRole = () => {
 }
 
 const userNav = [
+  { href: '/dashboard/user', label: 'My Bookings' },
   { href: '/dashboard/user/bookings/new', label: 'New Booking' },
   { href: '/status', label: 'Check Status' },
 ];
