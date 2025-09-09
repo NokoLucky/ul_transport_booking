@@ -28,7 +28,7 @@ export async function addInspectorFiles(bookingId: string, pictures: (string | n
         action: action,
      };
 
-    const { error } = await supabase
+    const { data, error } = await supabase
         .from('pictures')
         .insert([pictureObjects]);
 
@@ -36,4 +36,6 @@ export async function addInspectorFiles(bookingId: string, pictures: (string | n
         console.error("Error inserting inspector files:", error)
         throw error
     };
+    
+    return data;
 }
