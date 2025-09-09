@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { FileUp, FileCheck2 } from 'lucide-react'
+import { sendBookingConfirmation } from '@/ai/flows/send-booking-confirmation-flow'
 
 type FileUploadCardProps = {
     title: string;
@@ -69,12 +70,20 @@ export function UploadForm({ bookingId }: { bookingId: string }) {
         }
     };
     
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         console.log("Uploading files for booking:", bookingId, files)
+
+        // In a real app, you'd get the user's name and email from their session or the booking details.
+        await sendBookingConfirmation({
+            name: 'Valued User', // Placeholder
+            email: 'user@limpopo.ac.za', // Placeholder
+            reference: bookingId,
+        });
+        
         toast({
-            title: "Documents Uploaded!",
-            description: "Your booking request has been fully submitted for review.",
+            title: "Application Sent!",
+            description: "Your booking request has been submitted. Please check your email for confirmation.",
         })
         router.push('/dashboard/user')
     }

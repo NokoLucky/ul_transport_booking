@@ -39,8 +39,7 @@ import { useRouter } from "next/navigation"
 
 const formSchema = z.object({
   // User Info
-  userFirstName: z.string().min(1, "First name is required"),
-  userSurname: z.string().min(1, "Surname is required"),
+  userName: z.string().min(1, "Full name is required"),
   userStaffNo: z.string().max(8, "Staff number can be at most 8 characters"),
   userMobile: z.string().max(10, "Mobile number can be at most 10 characters"),
   userEmail: z.string().email("Invalid email address"),
@@ -87,8 +86,7 @@ export function BookingForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      userFirstName: "",
-      userSurname: "",
+      userName: "",
       userStaffNo: "",
       userMobile: "",
       userEmail: "",
@@ -123,14 +121,9 @@ export function BookingForm() {
             <AccordionItem value="user-info">
                 <AccordionTrigger className="text-xl font-semibold">User Information</AccordionTrigger>
                 <AccordionContent className="p-4 space-y-8">
-                    <div className="grid md:grid-cols-2 gap-8">
-                        <FormField control={form.control} name="userFirstName" render={({ field }) => (
-                            <FormItem><FormLabel>First Name</FormLabel><FormControl><Input placeholder="John" {...field} /></FormControl><FormMessage /></FormItem>
-                        )} />
-                        <FormField control={form.control} name="userSurname" render={({ field }) => (
-                            <FormItem><FormLabel>Surname</FormLabel><FormControl><Input placeholder="Doe" {...field} /></FormControl><FormMessage /></FormItem>
-                        )} />
-                    </div>
+                    <FormField control={form.control} name="userName" render={({ field }) => (
+                        <FormItem><FormLabel>Full Name</FormLabel><FormControl><Input placeholder="John Doe" {...field} /></FormControl><FormMessage /></FormItem>
+                    )} />
                      <div className="grid md:grid-cols-2 gap-8">
                         <FormField control={form.control} name="userStaffNo" render={({ field }) => (
                             <FormItem><FormLabel>Staff No.</FormLabel><FormControl><Input placeholder="12345678" {...field} /></FormControl><FormMessage /></FormItem>
@@ -239,7 +232,7 @@ export function BookingForm() {
                                 <FormItem><FormLabel>Driver Surname</FormLabel><FormControl><Input placeholder="Driver's surname" {...field} /></FormControl><FormMessage /></FormItem>
                             )} />
                         </div>
-                        <div className="grid md:grid-cols-2 gap-8">
+                        <div className="grid md-grid-cols-2 gap-8">
                             <FormField control={form.control} name="driverStaffNo" render={({ field }) => (
                                 <FormItem><FormLabel>Driver Staff No.</FormLabel><FormControl><Input placeholder="Driver's staff number" {...field} /></FormControl><FormMessage /></FormItem>
                             )} />
