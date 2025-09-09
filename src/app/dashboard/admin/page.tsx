@@ -52,7 +52,8 @@ export default function AdminDashboard() {
         setCompletedBookings(completedBookingsData || []);
         setError(null);
       } catch (err: any) {
-        console.error("Failed to fetch dashboard data:", err);
+        const errorMessage = err.message || JSON.stringify(err);
+        console.error("Failed to fetch dashboard data:", errorMessage);
         setError("Failed to load booking data. Please try again later.");
       } finally {
         setLoading(false);
@@ -189,5 +190,3 @@ export default function AdminDashboard() {
     </div>
   )
 }
-
-    
