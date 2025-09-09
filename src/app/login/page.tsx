@@ -22,10 +22,10 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-muted/40">
       <Card className="mx-auto max-w-sm w-full">
         <CardHeader className="text-center">
-            <div className="flex items-center gap-4 justify-center mb-4">
+            <div className="flex flex-col items-center gap-2 justify-center mb-4">
                 <Bus className="h-12 w-12 text-primary" />
-                <h1 className="font-headline text-4xl font-bold">
-                    LimpopoRide
+                <h1 className="font-headline text-2xl font-bold">
+                    University Of Limpopo Transport Booking System
                 </h1>
             </div>
           <CardTitle className="text-2xl">Staff Login</CardTitle>

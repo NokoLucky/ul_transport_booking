@@ -3,7 +3,7 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster"
 
 export const metadata: Metadata = {
-  title: 'LimpopoRide',
+  title: 'University Of Limpopo Transport Booking System',
   description: 'University of Limpopo Transport Management System',
 };
 

@@ -19,7 +19,7 @@ export default function HomePage() {
         <div className="flex items-center gap-4">
           <Bus className="h-16 w-16 text-accent" />
           <h1 className="font-headline text-5xl font-bold tracking-tight md:text-7xl">
-            LimpopoRide
+            University Of Limpopo Transport Booking System
           </h1>
         </div>
         <p className="mt-4 max-w-2xl font-body text-lg text-gray-200 md:text-xl">
