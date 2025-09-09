@@ -111,7 +111,7 @@ export function UploadForm({ bookingId }: { bookingId: string }) {
                 title: "Application Sent!",
                 description: "Your booking request has been submitted. Please check your email for confirmation.",
             })
-            router.push('/dashboard/user')
+            router.push('/status')
 
         } catch (error: any) {
             console.error("Upload process error:", error);
