@@ -44,7 +44,7 @@ const formSchema = z.object({
   vehicle: z.string().min(1, "Please select a vehicle."),
   kms: z.string().min(1, "KMS is required."),
   disk_expiry: z.date({ required_error: "License disk expiry date is required." }),
-  condition: z.string().min(1, "Vehicle condition description is required."),
+  car_condition: z.string().min(1, "Vehicle condition description is required."),
 
   // Checklists
   accessories: z.array(z.string()).refine(value => value.some(item => item), {
@@ -133,7 +133,7 @@ export function AllocationForm({ booking }: { booking: any }) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       kms: "",
-      condition: "",
+      car_condition: "",
       remarks: "",
       accessories: [],
       engine: [],
@@ -191,7 +191,7 @@ export function AllocationForm({ booking }: { booking: any }) {
             disk_expiry: format(values.disk_expiry, "yyyy-MM-dd"),
             remarks: values.remarks,
             fuel: values.fuel,
-            condition: values.condition,
+            car_condition: values.car_condition,
             accessories: JSON.stringify(values.accessories),
             engine: JSON.stringify(values.engine),
             electrical: JSON.stringify(values.electrical),
@@ -297,7 +297,7 @@ export function AllocationForm({ booking }: { booking: any }) {
                 />
                  <FormField
                     control={form.control}
-                    name="condition"
+                    name="car_condition"
                     render={({ field }) => (
                         <FormItem>
                         <FormLabel>Vehicle Condition *</FormLabel>
@@ -386,5 +386,3 @@ export function AllocationForm({ booking }: { booking: any }) {
     </Form>
   )
 }
-
-    
