@@ -2,6 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
@@ -116,7 +117,9 @@ export default function InspectorDashboard() {
                                                 <TableCell>{!booking.driver_name ? 'Required' : 'Not Required'}</TableCell>
                                                 <TableCell>
                                                     <div className="flex gap-2">
-                                                        <Button size="sm">Allocate</Button>
+                                                        <Button size="sm" asChild>
+                                                            <Link href={`/dashboard/inspector/allocate/${booking.id}`}>Allocate</Link>
+                                                        </Button>
                                                         <Button size="sm" variant="destructive" onClick={() => handleReject(booking.id)}>Reject</Button>
                                                     </div>
                                                 </TableCell>

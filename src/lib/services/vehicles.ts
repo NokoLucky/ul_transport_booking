@@ -1,6 +1,7 @@
+
 import { supabase } from '@/lib/supabase/client';
 
-export async function getVehicles(category) {
+export async function getVehicles(category: string) {
   const { data, error } = await supabase
     .from('vehicles')
     .select('*')
@@ -11,7 +12,7 @@ export async function getVehicles(category) {
   return data;
 }
 
-export async function updateVehicleStatus(registration, vehicleStatus) {
+export async function updateVehicleStatus(registration: string, vehicleStatus: string) {
   const { error } = await supabase
     .from('vehicles')
     .update({ status: vehicleStatus })
