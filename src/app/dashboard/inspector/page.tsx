@@ -1,112 +1,186 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { MoreHorizontal } from 'lucide-react'
 
-import type { Booking } from '@/types'
+'use client';
+
+import { useState, useEffect } from 'react';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Button } from '@/components/ui/button'
+import { useToast } from '@/hooks/use-toast';
+import { getInspectorBookings, updateBookingStatus } from '@/lib/services/bookings';
+import { getCompletedBookingsCheckin } from '@/lib/services/completion';
 
 export default function InspectorDashboard() {
-  const bookings: Booking[] = [
-    {
-      id: 'BK002',
-      purpose: 'Student Sports Trip',
-      destination: 'Peter Mokaba Stadium',
-      user: { name: 'Mrs. Jane Smith', department: 'Sports Admin' },
-      dates: { start: new Date('2024-08-15'), end: new Date('2024-08-15') },
-      status: 'Pending Inspector',
-      vehicle: '22-Seater Minibus'
-    },
-    {
-      id: 'BK007',
-      purpose: 'Geology Field Trip',
-      destination: 'Magoebaskloof',
-      user: { name: 'Dr. Anna Bell', department: 'Geography' },
-      dates: { start: new Date('2024-08-18'), end: new Date('2024-08-19') },
-      status: 'Pending Inspector',
-      vehicle: '4x4 Bakkie'
-    },
-  ];
+    const [checkOutBookings, setCheckOutBookings] = useState<any[]>([]);
+    const [checkInBookings, setCheckInBookings] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const { toast } = useToast();
 
-  return (
-    <div className="space-y-6">
-      
-      <Card>
-        <CardHeader>
-          <CardTitle>Awaiting Vehicle Inspection</CardTitle>
-          <CardDescription>
-            These bookings require your inspection for vehicle availability and condition.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>User</TableHead>
-                <TableHead>Trip Details</TableHead>
-                <TableHead>Vehicle Requested</TableHead>
-                <TableHead>Dates</TableHead>
-                <TableHead><span className="sr-only">Actions</span></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {bookings.map((booking) => (
-                <TableRow key={booking.id}>
-                  <TableCell>
-                    <div className="font-medium">{booking.user.name}</div>
-                    <div className="text-sm text-muted-foreground">{booking.user.department}</div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="font-medium">{booking.destination}</div>
-                    <div className="text-sm text-muted-foreground">{booking.purpose}</div>
-                  </TableCell>
-                  <TableCell>{booking.vehicle || 'N/A'}</TableCell>
-                  <TableCell>{`${booking.dates.start.toLocaleDateString()} - ${booking.dates.end.toLocaleDateString()}`}</TableCell>
-                  <TableCell>
-                     <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button aria-haspopup="true" size="icon" variant="ghost">
-                            <MoreHorizontal className="h-4 w-4" />
-                            <span className="sr-only">Toggle menu</span>
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Inspection Actions</DropdownMenuLabel>
-                          <DropdownMenuItem>View Details</DropdownMenuItem>
-                          <DropdownMenuItem>Check Vehicle Log</DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem>Approve Availability</DropdownMenuItem>
-                          <DropdownMenuItem className="text-destructive focus:text-destructive focus:bg-destructive/10">Deny Availability</DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-    </div>
-  )
+    useEffect(() => {
+        async function fetchData() {
+            try {
+                setLoading(true);
+                const [checkOutData, checkInData] = await Promise.all([
+                    getInspectorBookings(),
+                    getCompletedBookingsCheckin()
+                ]);
+                setCheckOutBookings(checkOutData || []);
+                setCheckInBookings(checkInData || []);
+                setError(null);
+            } catch (err: any) {
+                const errorMessage = err.message || JSON.stringify(err);
+                console.error("Failed to fetch inspector data:", errorMessage);
+                setError("Failed to load booking data. Please try again later.");
+            } finally {
+                setLoading(false);
+            }
+        }
+        fetchData();
+    }, []);
+    
+    const handleReject = async (bookingId: string) => {
+        if (confirm('Are you sure you want to reject this application?')) {
+            try {
+                await updateBookingStatus(bookingId, 'Rejected');
+                setCheckOutBookings(prev => prev.filter(b => b.id !== bookingId));
+                toast({
+                    title: 'Booking Rejected',
+                    description: 'The booking request has been rejected.',
+                    variant: 'destructive'
+                });
+            } catch (error) {
+                console.error('Failed to reject booking:', error);
+                toast({
+                    title: 'Rejection Failed',
+                    description: 'Could not reject the booking. Please try again.',
+                    variant: 'destructive'
+                });
+            }
+        }
+    };
+
+
+    if (loading) {
+        return <div className="text-center p-8">Loading dashboard...</div>
+    }
+    if (error) {
+        return <div className="text-center p-8 text-destructive">{error}</div>
+    }
+
+    return (
+        <div className="space-y-6">
+            <Card>
+                <CardHeader>
+                    <CardTitle className="font-headline text-3xl">Inspector Dashboard</CardTitle>
+                    <CardDescription>Manage all vehicle check-outs and check-ins.</CardDescription>
+                </CardHeader>
+            </Card>
+
+            <Accordion type="multiple" defaultValue={['check-out', 'check-in']} className="w-full">
+                <AccordionItem value="check-out">
+                    <AccordionTrigger className="text-xl font-semibold bg-muted px-6 rounded-t-lg">
+                        Check Out Vehicles
+                    </AccordionTrigger>
+                    <AccordionContent className="p-2 md:p-4 border border-t-0 rounded-b-lg">
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Vehicle Requests Details</CardTitle>
+                                <CardDescription>Allocate vehicles for these approved requests.</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Applicant</TableHead>
+                                            <TableHead>Contact</TableHead>
+                                            <TableHead>Department</TableHead>
+                                            <TableHead>Vehicle</TableHead>
+                                            <TableHead>Driver</TableHead>
+                                            <TableHead>Actions</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {checkOutBookings.length > 0 ? checkOutBookings.map((booking) => (
+                                            <TableRow key={booking.id}>
+                                                <TableCell>
+                                                    <div className="font-medium">{booking.user_name} {booking.user_surname}</div>
+                                                    <div className="text-sm text-muted-foreground">Staff: {booking.user_staffno}</div>
+                                                </TableCell>
+                                                <TableCell>{booking.user_mobile}</TableCell>
+                                                <TableCell>
+                                                    <div className="font-medium">{booking.department}</div>
+                                                    <div className="text-sm text-muted-foreground">{booking.building} - {booking.officeno}</div>
+                                                </TableCell>
+                                                <TableCell>{booking.car_type}</TableCell>
+                                                <TableCell>{!booking.driver_name ? 'Required' : 'Not Required'}</TableCell>
+                                                <TableCell>
+                                                    <div className="flex gap-2">
+                                                        <Button size="sm">Allocate</Button>
+                                                        <Button size="sm" variant="destructive" onClick={() => handleReject(booking.id)}>Reject</Button>
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        )) : (
+                                            <TableRow>
+                                                <TableCell colSpan={6} className="text-center">No new check-out requests found.</TableCell>
+                                            </TableRow>
+                                        )}
+                                    </TableBody>
+                                </Table>
+                            </CardContent>
+                        </Card>
+                    </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="check-in">
+                    <AccordionTrigger className="text-xl font-semibold bg-muted px-6 rounded-t-lg">
+                        Check In Vehicles
+                    </AccordionTrigger>
+                    <AccordionContent className="p-2 md:p-4 border border-t-0 rounded-b-lg">
+                        <Card>
+                             <CardHeader>
+                                <CardTitle>Returned Vehicle Details</CardTitle>
+                                <CardDescription>Check in vehicles that have returned from their trips.</CardDescription>
+                            </CardHeader>
+                             <CardContent>
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Applicant</TableHead>
+                                            <TableHead>Returned Vehicle</TableHead>
+                                            <TableHead>Disk Expiry</TableHead>
+                                            <TableHead>Last Mileage</TableHead>
+                                            <TableHead>Driver</TableHead>
+                                            <TableHead>Actions</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {checkInBookings.length > 0 ? checkInBookings.map((comp) => (
+                                            <TableRow key={comp.id}>
+                                                <TableCell>
+                                                    <div className="font-medium">{comp.booking.user_name} {comp.booking.user_surname}</div>
+                                                    <div className="text-sm text-muted-foreground">Staff: {comp.booking.user_staffno} | {comp.booking.user_mobile}</div>
+                                                </TableCell>
+                                                <TableCell>{comp.vehicle}</TableCell>
+                                                <TableCell>{comp.disk_expiry}</TableCell>
+                                                <TableCell>{comp.kms} km</TableCell>
+                                                <TableCell>{comp.drivers?.name || 'Not Required'}</TableCell>
+                                                <TableCell>
+                                                    <Button size="sm">Check In</Button>
+                                                </TableCell>
+                                            </TableRow>
+                                        )) : (
+                                            <TableRow>
+                                                <TableCell colSpan={6} className="text-center">No new check-in requests found.</TableCell>
+                                            </TableRow>
+                                        )}
+                                    </TableBody>
+                                </Table>
+                            </CardContent>
+                        </Card>
+                    </AccordionContent>
+                </AccordionItem>
+            </Accordion>
+        </div>
+    )
 }

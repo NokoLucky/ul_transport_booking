@@ -32,7 +32,11 @@ export async function getOneCompletedBooking(allocateId) {
 export async function getCompletedBookingsCheckin() {
     const { data, error } = await supabase
         .from('allocates')
-        .select('*')
+        .select(`
+            *,
+            booking (*),
+            drivers (*)
+        `)
         .eq('booking.status', 'Completed');
 
     if (error) throw error;
