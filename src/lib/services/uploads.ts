@@ -22,7 +22,7 @@ export async function addInspectorFiles(bookingId, pictures, action) {
         picture4: pictures[3] || null,
         picture5: pictures[4] || null,
         picture6: pictures[5] || null,
-        picture7: pictures[6]_ || null,
+        picture7: pictures[6] || null,
         picture8: pictures[7] || null,
      };
 
