@@ -8,7 +8,6 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-  CardFooter
 } from '@/components/ui/card'
 import {
   Table,
@@ -23,6 +22,7 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
+import { getStatus } from '@/lib/services/status'
 
 type BookingResult = {
   id: string;
@@ -34,59 +34,40 @@ type BookingResult = {
   building: string;
   officeno: string;
   car_type: string;
-  driver_required: 'Yes' | 'No';
   status: string;
+  reference: string;
 }
 
 export default function StatusPage() {
   const [reference, setReference] = useState('')
   const [result, setResult] = useState<BookingResult | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
 
-  const handleCheck = (e: React.FormEvent) => {
+  const handleCheck = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
     setResult(null)
+    setIsLoading(true)
 
     if (reference.trim() === '') {
       setError('Please enter a reference number.')
+      setIsLoading(false)
       return
     }
 
-    // This is mock data. In a real application, you would fetch this from your backend.
-    const mockData: { [key: string]: BookingResult } = {
-      'ULTRANS69904': {
-        id: 'ULTRANS69904',
-        user_name: 'John',
-        user_surname: 'Doe',
-        user_staffno: '12345',
-        user_mobile: '0812345678',
-        department: 'Computer Science',
-        building: 'New R-Block',
-        officeno: '1024',
-        car_type: 'SEDAN',
-        driver_required: 'Yes',
-        status: 'Pending Admin',
-      },
-      'ULTRANS12345': {
-        id: 'ULTRANS12345',
-        user_name: 'Jane',
-        user_surname: 'Smith',
-        user_staffno: '54321',
-        user_mobile: '0823456789',
-        department: 'Sports Admin',
-        building: 'Sports Complex',
-        officeno: 'G01',
-        car_type: '22 SEATERS',
-        driver_required: 'No',
-        status: 'Pending Inspector',
-      },
-    }
-
-    if (mockData[reference.toUpperCase()]) {
-      setResult(mockData[reference.toUpperCase()]);
-    } else {
-      setError(`No booking found for reference number: ${reference}`);
+    try {
+      const bookingData = await getStatus(reference.trim().toUpperCase());
+      if (bookingData) {
+        setResult(bookingData as BookingResult);
+      } else {
+        setError(`No booking found for reference number: ${reference}`);
+      }
+    } catch (err: any) {
+       console.error("Status check error:", err);
+       setError(err.message || `An error occurred while fetching booking status.`);
+    } finally {
+        setIsLoading(false)
     }
   }
   
@@ -114,12 +95,13 @@ export default function StatusPage() {
               <Input
                 id="reference"
                 type="text"
-                placeholder="e.g., ULTRANS69904"
+                placeholder="e.g., ULTRANS..."
                 value={reference}
                 onChange={(e) => setReference(e.target.value)}
+                disabled={isLoading}
               />
             </div>
-            <Button type="submit">Check</Button>
+            <Button type="submit" disabled={isLoading}>{isLoading ? 'Searching...' : 'Check'}</Button>
             <Button asChild variant="outline">
               <Link href="/">Back</Link>
             </Button>
@@ -129,41 +111,29 @@ export default function StatusPage() {
 
           {result && (
             <div className="w-full">
-              <h4 className="text-xl font-semibold mb-4">Vehicle Request Details</h4>
+              <h4 className="text-xl font-semibold mb-4">Booking Request Details for #{result.reference}</h4>
               <hr className="mb-4" />
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>First Name</TableHead>
-                      <TableHead>Surname</TableHead>
-                      <TableHead>Staff No.</TableHead>
-                      <TableHead>Mobile No.</TableHead>
+                      <TableHead>Applicant</TableHead>
                       <TableHead>Department</TableHead>
-                      <TableHead>Building</TableHead>
-                      <TableHead>Office No.</TableHead>
-                      <TableHead>Vehicle</TableHead>
-                      <TableHead>Driver Req.</TableHead>
+                      <TableHead>Vehicle Type</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Action</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     <TableRow>
-                      <TableCell>{result.user_name}</TableCell>
-                      <TableCell>{result.user_surname}</TableCell>
-                      <TableCell>{result.user_staffno}</TableCell>
-                      <TableCell>{result.user_mobile}</TableCell>
+                      <TableCell>{result.user_name} {result.user_surname}</TableCell>
                       <TableCell>{result.department}</TableCell>
-                      <TableCell>{result.building}</TableCell>
-                      <TableCell>{result.officeno}</TableCell>
                       <TableCell>{result.car_type}</TableCell>
-                      <TableCell>{result.driver_required}</TableCell>
                       <TableCell>
                         <Badge variant={getBadgeVariant(result.status)}>{result.status}</Badge>
                       </TableCell>
                       <TableCell>
-                        <Button variant="link" className="p-0 h-auto text-destructive" onClick={() => alert('Booking cancellation action!')}>
+                        <Button variant="link" className="p-0 h-auto text-destructive" onClick={() => alert('Cancel booking functionality not yet implemented.')}>
                           Cancel Booking
                         </Button>
                       </TableCell>

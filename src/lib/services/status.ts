@@ -1,12 +1,17 @@
 import { supabase } from '@/lib/supabase/client';
 
-export async function getStatus(reference) {
+export async function getStatus(reference: string) {
     const { data, error } = await supabase
         .from('booking')
         .select('*')
-        .eq('id', reference) // Assuming reference is the booking_id
+        .eq('reference', reference)
         .single();
 
-    if (error) throw error;
+    if (error) {
+        if (error.code === 'PGRST116') { // PostgREST error for "exact one row not found"
+            return null;
+        }
+        throw error;
+    }
     return data;
 }
