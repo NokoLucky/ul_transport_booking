@@ -105,7 +105,7 @@ export function ImageUploadForm({ bookingId }: { bookingId: string }) {
             const uploadPromises = files.map(file => uploadFile(file, bookingId));
             const uploadedUrls = await Promise.all(uploadPromises);
 
-            await addInspectorFiles(bookingId, uploadedUrls, 'Checkout');
+            await addInspectorFiles(bookingId, uploadedUrls);
             
             toast({
                 title: "Images Uploaded Successfully!",
