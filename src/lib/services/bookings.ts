@@ -1,3 +1,4 @@
+
 import { supabase } from '@/lib/supabase/client';
 
 export async function addBooking(bookingDetails) {
