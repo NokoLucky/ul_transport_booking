@@ -13,7 +13,7 @@ export default function NewBookingPage() {
     <div className="space-y-6">
         <div className="relative h-60 w-full rounded-lg overflow-hidden">
             <Image
-                src="https://picsum.photos/1200/400"
+                src="/booking-background.jpg"
                 alt="UL Fleet Vehicle"
                 data-ai-hint="fleet vehicle"
                 fill
@@ -39,5 +39,3 @@ export default function NewBookingPage() {
     </div>
   )
 }
-
-    

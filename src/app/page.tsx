@@ -7,7 +7,7 @@ export default function HomePage() {
   return (
     <div className="relative min-h-screen w-full">
       <Image
-        src="https://picsum.photos/1920/1080"
+        src="/home-background.jpg"
         alt="Background image of a university vehicle"
         fill
         className="object-cover"
