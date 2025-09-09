@@ -18,7 +18,10 @@ export async function updateVehicleStatus(registration: string, vehicleStatus: s
     .update({ status: vehicleStatus })
     .eq('registration', registration);
 
-  if (error) throw error;
+  if (error) {
+    console.error("Error updating vehicle status:", error);
+    throw error;
+  }
 }
 
 export async function getDrivers() {

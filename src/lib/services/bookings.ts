@@ -59,7 +59,7 @@ export async function getInspectorOneBooking(bookingId) {
   return getOneBooking(bookingId);
 }
 
-export async function updateBookingStatus(bookingId, status) {
+export async function updateBookingStatus(bookingId: string, status: string) {
     const { data, error } = await supabase
         .from('booking')
         .update({ status })

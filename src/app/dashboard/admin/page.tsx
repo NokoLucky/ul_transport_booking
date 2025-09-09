@@ -22,6 +22,7 @@ import { Button } from '@/components/ui/button'
 import { getBookings, updateBookingStatus } from '@/lib/services/bookings';
 import { getCompletedBookings } from '@/lib/services/completion';
 import { useToast } from '@/hooks/use-toast';
+import { sendFinalConfirmation } from '@/ai/flows/send-final-confirmation-flow';
 
 // A helper function to extract filename from a URL
 const getFileName = (url: string | null | undefined): string => {
@@ -104,6 +105,40 @@ export default function AdminDashboard() {
     }
   }
 
+  const handleSendConfirmation = async (comp: any) => {
+    try {
+      const confirmationInput = {
+        clientName: comp.booking.user_name,
+        clientEmail: comp.booking.user_email,
+        vehicleDetails: comp.vehicle,
+        departDateTime: new Date(comp.booking.depart_date).toLocaleString(),
+        returnDateTime: new Date(comp.booking.return_date).toLocaleString(),
+        allocationId: comp.id,
+        bookingId: comp.booking.id,
+        driver: comp.drivers ? {
+          name: comp.drivers.name,
+          mobile: comp.drivers.cellphone,
+          email: comp.drivers.email,
+        } : null,
+      };
+
+      await sendFinalConfirmation(confirmationInput);
+
+      setCompletedBookings(prev => prev.filter(c => c.id !== comp.id));
+      toast({
+        title: "Confirmation Sent!",
+        description: "The confirmation email has been sent to the client.",
+      });
+
+    } catch (error: any) {
+      console.error('Failed to send confirmation:', error);
+      toast({
+        title: "Confirmation Failed",
+        description: 'Could not send the confirmation. Please try again.',
+        variant: 'destructive'
+      });
+    }
+  }
 
   if (loading) {
       return <div className="text-center p-8">Loading dashboard...</div>
@@ -219,7 +254,7 @@ export default function AdminDashboard() {
                                </TableCell>
                                <TableCell>{comp.drivers?.name || 'Not Required'}</TableCell>
                                <TableCell>
-                                   <Button size="sm" onClick={() => alert('Sending confirmation...')}>Send Confirmation</Button>
+                                   <Button size="sm" onClick={() => handleSendConfirmation(comp)}>Send Confirmation</Button>
                                </TableCell>
                            </TableRow>
                            )
