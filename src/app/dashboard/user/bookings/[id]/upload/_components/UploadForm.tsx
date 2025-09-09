@@ -24,25 +24,27 @@ type FileUploadCardProps = {
 const FileUploadCard = ({ title, description, fileId, fileName, handleFileChange }: FileUploadCardProps) => (
     <Card>
         <CardHeader>
-            <CardTitle className="text-xl">{title}</CardTitle>
-            <CardDescription>{description}</CardDescription>
+            <CardTitle className="text-xl">Choose File</CardTitle>
+            <CardDescription>{title}</CardDescription>
         </CardHeader>
         <CardContent>
              <div className="flex flex-col items-center justify-center w-full p-6 border-2 border-dashed rounded-lg">
+                <header>
+                    <h4 className="font-semibold">{description}</h4>
+                </header>
                 {fileName ? (
-                    <div className="text-center text-green-600">
+                    <div className="text-center text-green-600 mt-4">
                         <FileCheck2 className="mx-auto h-12 w-12" />
                         <p className="mt-2 font-semibold">{fileName}</p>
                         <p className="text-sm text-muted-foreground">Ready to upload!</p>
                     </div>
                 ) : (
                     <>
-                        <FileUp className="h-12 w-12 text-muted-foreground" />
+                        <p className="mt-2 text-xs text-muted-foreground">Files Supported: PDF, DOC, DOCX</p>
                         <Label htmlFor={fileId} className="mt-4 inline-block bg-primary text-primary-foreground px-4 py-2 rounded-md cursor-pointer hover:bg-primary/90 text-sm font-medium">
                             Choose File
                         </Label>
                         <Input id={fileId} type="file" className="hidden" onChange={handleFileChange} accept=".pdf,.doc,.docx" />
-                        <p className="mt-2 text-xs text-muted-foreground">Supported: PDF, DOC, DOCX</p>
                     </>
                 )}
             </div>
@@ -100,8 +102,6 @@ export function UploadForm({ bookingId }: { bookingId: string }) {
 
             await addBookingFiles(bookingId, leaveUrl, passengersUrl, driversLicenseUrl);
 
-            // In a real app, you'd get the user's name and email from the booking details.
-            // For now, we'll use placeholders.
             const bookingDetails = await supabase.from('BOOKING').select('user_name, user_email').eq('id', bookingId).single();
             if(bookingDetails.error) throw bookingDetails.error;
             
@@ -131,10 +131,10 @@ export function UploadForm({ bookingId }: { bookingId: string }) {
 
     return (
         <form onSubmit={handleSubmit} className="space-y-8">
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="space-y-6">
                 <FileUploadCard 
-                    title="Leave of Absence"
-                    description="Required for all employees taking official leave."
+                    title="Leave of Absence (if employee)"
+                    description="Leave of Absence"
                     fileId="leave"
                     fileName={files.leave?.name || null}
                     handleFileChange={handleFileChange}
@@ -142,8 +142,8 @@ export function UploadForm({ bookingId }: { bookingId: string }) {
                 
                 {hasPassengers && (
                     <FileUploadCard 
-                        title="List of Passengers"
-                        description="A document listing all passengers for the trip."
+                        title="List of Passangers (if any)"
+                        description="List of Passengers"
                         fileId="passengers"
                         fileName={files.passengers?.name || null}
                         handleFileChange={handleFileChange}
@@ -152,8 +152,8 @@ export function UploadForm({ bookingId }: { bookingId: string }) {
 
                 {isOwnDriver && (
                      <FileUploadCard 
-                        title="Driver's License"
-                        description="A valid copy of the designated driver's license."
+                        title="Drivers License (if own driver)"
+                        description="Driver's License"
                         fileId="driversLicense"
                         fileName={files.driversLicense?.name || null}
                         handleFileChange={handleFileChange}
@@ -161,14 +161,16 @@ export function UploadForm({ bookingId }: { bookingId: string }) {
                 )}
             </div>
 
-            <div className="flex justify-end pt-4 gap-4">
-                <Button type="button" variant="outline" onClick={() => router.back()} disabled={isUploading}>Back to Booking Form</Button>
-                <Button type="submit" disabled={isUploading}>
-                    {isUploading ? 'Uploading...' : 'Complete Booking'}
-                </Button>
-            </div>
+            <Card>
+                <CardHeader>
+                     <CardTitle className="text-xl">Upload Files</CardTitle>
+                </CardHeader>
+                <CardContent>
+                     <Button type="submit" className="w-full" disabled={isUploading}>
+                        {isUploading ? 'Uploading...' : 'Complete Booking'}
+                    </Button>
+                </CardContent>
+            </Card>
         </form>
     )
 }
-
-    
