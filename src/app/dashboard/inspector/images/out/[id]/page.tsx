@@ -7,6 +7,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { ImageUp } from 'lucide-react'
+import { ImageUploadForm } from './_components/ImageUploadForm'
 
 export default function InspectorUploadPage({ params }: { params: { id: string } }) {
   return (
@@ -17,17 +18,17 @@ export default function InspectorUploadPage({ params }: { params: { id: string }
                 <h1 className="font-headline text-4xl font-bold">Upload Vehicle Images (Check Out)</h1>
             </div>
             <p className="text-lg text-muted-foreground">
-                Upload images for the vehicle allocated to booking <span className="font-semibold text-primary">#{params.id}</span>.
+                Upload up to 8 images for the vehicle allocated to booking <span className="font-semibold text-primary">#{params.id}</span>.
             </p>
         </div>
         
         <Card>
             <CardHeader>
                 <CardTitle>Image Upload</CardTitle>
-                <CardDescription>This feature is not yet implemented.</CardDescription>
+                <CardDescription>Select all required images before uploading. Supported formats: PNG, JPEG, GIF.</CardDescription>
             </CardHeader>
             <CardContent>
-                <p>The form to upload inspector images will be here.</p>
+                <ImageUploadForm bookingId={params.id} />
             </CardContent>
         </Card>
     </div>

@@ -1,6 +1,7 @@
+
 import { supabase } from '@/lib/supabase/client';
 
-export async function addBookingFiles(bookingId, leaveFormPath, passengersPath, driversLicensePath) {
+export async function addBookingFiles(bookingId: string, leaveFormPath: string | null, passengersPath: string | null, driversLicensePath: string | null) {
     const { error } = await supabase
         .from('uploads')
         .insert([{
@@ -13,7 +14,7 @@ export async function addBookingFiles(bookingId, leaveFormPath, passengersPath, 
     if (error) throw error;
 }
 
-export async function addInspectorFiles(bookingId, pictures, action) {
+export async function addInspectorFiles(bookingId: string, pictures: (string | null)[], action: string) {
      const pictureObjects = {
         booking_id: bookingId,
         picture1: pictures[0] || null,
@@ -24,11 +25,15 @@ export async function addInspectorFiles(bookingId, pictures, action) {
         picture6: pictures[5] || null,
         picture7: pictures[6] || null,
         picture8: pictures[7] || null,
+        action: action
      };
 
     const { error } = await supabase
         .from('pictures')
         .insert([pictureObjects]);
 
-    if (error) throw error;
+    if (error) {
+        console.error("Error inserting inspector files:", error)
+        throw error
+    };
 }
