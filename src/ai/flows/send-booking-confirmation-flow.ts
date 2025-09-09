@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview A flow for sending a booking confirmation email.
@@ -48,9 +49,10 @@ export const sendBookingConfirmationFlow = ai.defineFlow(
     
     // In a real application, you would integrate with an email sending service here.
     // For now, we will simulate sending the email by generating the content.
-    await emailPrompt(input);
+    const emailContent = await emailPrompt(input);
 
-    console.log(`Sending booking confirmation to ${input.email} for reference ${input.reference}`);
+    console.log(`SIMULATED EMAIL SENT to ${input.email} for reference ${input.reference}`);
+    console.log('Email Body:', emailContent.text);
     
     return { success: true };
   }
