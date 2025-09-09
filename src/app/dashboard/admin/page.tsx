@@ -28,8 +28,9 @@ const getFileName = (url: string | null | undefined): string => {
     try {
         const path = new URL(url).pathname;
         const parts = path.split('/');
-        return parts[parts.length - 1] || '';
+        return decodeURIComponent(parts[parts.length - 1] || '');
     } catch (e) {
+        console.error("Failed to parse URL for filename:", url, e);
         return '';
     }
 };
@@ -116,10 +117,13 @@ export default function AdminDashboard() {
                                 </TableCell>
                                 <TableCell>{booking.car_type}</TableCell>
                                 <TableCell>{!booking.driver_name ? 'Required' : 'Provided'}</TableCell>
-                                <TableCell className="flex flex-col gap-1">
-                                    {booking.uploads?.[0]?.leave_form && <a href={booking.uploads[0].leave_form} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline text-xs">{getFileName(booking.uploads[0].leave_form)}</a>}
-                                    {booking.uploads?.[0]?.passengers && <a href={booking.uploads[0].passengers} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline text-xs">{getFileName(booking.uploads[0].passengers)}</a>}
-                                    {booking.uploads?.[0]?.drivers && <a href={booking.uploads[0].drivers} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline text-xs">{getFileName(booking.uploads[0].drivers)}</a>}
+                                <TableCell>
+                                    <div className="flex flex-col gap-1">
+                                        {booking.uploads?.[0]?.leave_form && <a href={booking.uploads[0].leave_form} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline text-xs">{getFileName(booking.uploads[0].leave_form) || 'Leave Form'}</a>}
+                                        {booking.uploads?.[0]?.passengers && <a href={booking.uploads[0].passengers} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline text-xs">{getFileName(booking.uploads[0].passengers) || 'Passengers List'}</a>}
+                                        {booking.uploads?.[0]?.drivers && <a href={booking.uploads[0].drivers} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline text-xs">{getFileName(booking.uploads[0].drivers) || 'Driver\'s License'}</a>}
+                                        {(!booking.uploads || Object.values(booking.uploads[0] || {}).every(v => !v)) && <span className="text-xs text-muted-foreground">No files</span>}
+                                    </div>
                                 </TableCell>
                                 <TableCell>
                                     <div className="flex gap-2">
