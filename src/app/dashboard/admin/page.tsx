@@ -114,7 +114,7 @@ export default function AdminDashboard() {
         departDateTime: new Date(comp.booking.depart_date).toLocaleString(),
         returnDateTime: new Date(comp.booking.return_date).toLocaleString(),
         allocationId: comp.id,
-        bookingId: comp.booking.id,
+        bookingId: String(comp.booking.id),
         driver: comp.drivers ? {
           name: comp.drivers.name,
           mobile: comp.drivers.cellphone,

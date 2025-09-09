@@ -21,7 +21,7 @@ const SendFinalConfirmationInputSchema = z.object({
   departDateTime: z.string().describe('The departure date and time.'),
   returnDateTime: z.string().describe('The return date and time.'),
   allocationId: z.number().describe('The ID of the allocation record.'),
-  bookingId: z.string().describe('The ID of the booking record.'),
+  bookingId: z.string().or(z.number()).describe('The ID of the booking record.'),
   driver: z.object({
     name: z.string().optional(),
     mobile: z.string().optional(),
@@ -139,7 +139,7 @@ export const sendFinalConfirmationFlow = ai.defineFlow(
     
     // 3. Update statuses in the database
     const vehicleRegistration = input.vehicleDetails.split(' - ')[1];
-    await updateBookingStatus(input.bookingId, 'Approved');
+    await updateBookingStatus(String(input.bookingId), 'Approved');
     await updateVehicleStatus(vehicleRegistration, 'Completed'); // This seems counterintuitive, but matching PHP logic. Might need review.
     
     return { success: true };
