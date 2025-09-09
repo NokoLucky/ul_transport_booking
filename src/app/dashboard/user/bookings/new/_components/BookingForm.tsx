@@ -36,6 +36,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { useToast } from "@/hooks/use-toast"
 import { useRouter } from "next/navigation"
 import { addBooking } from "@/lib/services/bookings"
+import crypto from 'crypto'
 
 const formSchema = z.object({
   // User Info
@@ -62,11 +63,17 @@ const formSchema = z.object({
   driverLicenseIssue: z.date().optional(),
   driverLicenseExpiry: z.date().optional(),
 
+  // Cost Centre Info
+  costCentre: z.string().min(1, "Cost centre is required"),
+  costName: z.string().min(1, "Person in charge is required"),
+  costAccName: z.string().min(1, "Accountant name is required"),
+  costAccNo: z.string().min(1, "Account number is required"),
+
   // Trip Info
   destination: z.string().min(2, "Destination must be at least 2 characters."),
-  estimatedDistance: z.coerce.number().min(1, "Estimated distance is required."),
+  estimatedDistance: z.string().min(1, "Estimated distance is required."),
   purpose: z.string().min(10, "Purpose must be at least 10 characters."),
-  passengers: z.coerce.number().min(1, "At least 1 passenger is required."),
+  passengers: z.string().min(1, "At least 1 passenger is required."),
   departDateTime: z.date(),
   returnDateTime: z.date(),
   tripDescription: z.string().optional(),
@@ -96,9 +103,13 @@ export function BookingForm() {
       department: "",
       building: "",
       officeNo: "",
+      costCentre: "",
+      costName: "",
+      costAccName: "",
+      costAccNo: "",
       destination: "",
       purpose: "",
-      passengers: 1,
+      passengers: "1",
     },
   })
   
@@ -106,6 +117,8 @@ export function BookingForm() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
+        const reference = `ULTRANS${crypto.randomBytes(3).toString('hex').toUpperCase()}`;
+
         const bookingData = {
             user_name: values.userName,
             user_surname: values.userSurname,
@@ -125,14 +138,19 @@ export function BookingForm() {
             driver_jobtype: values.driverJobType,
             license_issue: values.driverLicenseIssue ? format(values.driverLicenseIssue, 'yyyy-MM-dd') : null,
             license_expiry: values.driverLicenseExpiry ? format(values.driverLicenseExpiry, 'yyyy-MM-dd') : null,
+            cost_centre: values.costCentre,
+            cost_name: values.costName,
+            cost_accname: values.costAccName,
+            cost_accno: values.costAccNo,
             destination: values.destination,
             distance: values.estimatedDistance,
             purpose: values.purpose,
-            passengersno: values.passengers,
+            passengerno: values.passengers,
             depart_date: values.departDateTime ? format(values.departDateTime, "yyyy-MM-dd'T'HH:mm:ss") : null,
             return_date: values.returnDateTime ? format(values.returnDateTime, "yyyy-MM-dd'T'HH:mm:ss") : null,
             description: values.tripDescription,
-            status: 'In Progress'
+            status: 'In Progress',
+            reference: reference,
         };
 
         const bookingId = await addBooking(bookingData);
@@ -312,6 +330,28 @@ export function BookingForm() {
                 </AccordionItem>
             )}
 
+            {/* Cost Centre Information */}
+            <AccordionItem value="cost-info">
+                <AccordionTrigger className="text-xl font-semibold">Cost Centre Information</AccordionTrigger>
+                <AccordionContent className="p-4 space-y-8">
+                    <FormField control={form.control} name="costCentre" render={({ field }) => (
+                        <FormItem><FormLabel>Cost Centre</FormLabel><FormControl><Input placeholder="Enter Cost Centre" {...field} /></FormControl><FormMessage /></FormItem>
+                    )} />
+                    <div className="grid md:grid-cols-2 gap-8">
+                        <FormField control={form.control} name="costName" render={({ field }) => (
+                            <FormItem><FormLabel>Person in Charge</FormLabel><FormControl><Input placeholder="Name of HOD/Dean" {...field} /></FormControl><FormMessage /></FormItem>
+                        )} />
+                        <FormField control={form.control} name="costAccName" render={({ field }) => (
+                            <FormItem><FormLabel>Accountant Name</FormLabel><FormControl><Input placeholder="Name of Accountant" {...field} /></FormControl><FormMessage /></FormItem>
+                        )} />
+                    </div>
+                    <FormField control={form.control} name="costAccNo" render={({ field }) => (
+                        <FormItem><FormLabel>Account Number</FormLabel><FormControl><Input placeholder="Enter Account Number" {...field} /></FormControl><FormMessage /></FormItem>
+                    )} />
+                </AccordionContent>
+            </AccordionItem>
+
+
             {/* Trip Information */}
             <AccordionItem value="trip-info">
                 <AccordionTrigger className="text-xl font-semibold">Trip Information</AccordionTrigger>
@@ -321,7 +361,7 @@ export function BookingForm() {
                             <FormItem><FormLabel>Destination</FormLabel><FormControl><Input placeholder="e.g., Peter Mokaba Stadium" {...field} /></FormControl><FormMessage /></FormItem>
                         )} />
                         <FormField control={form.control} name="estimatedDistance" render={({ field }) => (
-                            <FormItem><FormLabel>Estimated Distance (KM)</FormLabel><FormControl><Input type="number" placeholder="e.g., 60" {...field} /></FormControl><FormMessage /></FormItem>
+                            <FormItem><FormLabel>Estimated Distance (KM)</FormLabel><FormControl><Input type="text" placeholder="e.g., 60" {...field} /></FormControl><FormMessage /></FormItem>
                         )} />
                     </div>
                      <div className="grid md:grid-cols-2 gap-8">
@@ -329,7 +369,7 @@ export function BookingForm() {
                             <FormItem><FormLabel>Purpose of Trip</FormLabel><FormControl><Input placeholder="e.g., Student Sports Trip" {...field} /></FormControl><FormMessage /></FormItem>
                         )} />
                         <FormField control={form.control} name="passengers" render={({ field }) => (
-                            <FormItem><FormLabel>Number of Passengers</FormLabel><FormControl><div className="relative"><Users className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" /><Input type="number" placeholder="1" {...field} className="pl-9" /></div></FormControl><FormMessage /></FormItem>
+                            <FormItem><FormLabel>Number of Passengers</FormLabel><FormControl><div className="relative"><Users className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" /><Input type="text" placeholder="1" {...field} className="pl-9" /></div></FormControl><FormMessage /></FormItem>
                         )} />
                     </div>
                      <div className="grid md:grid-cols-2 gap-8">

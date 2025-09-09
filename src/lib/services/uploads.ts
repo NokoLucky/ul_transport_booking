@@ -7,23 +7,28 @@ export async function addBookingFiles(bookingId, leaveFormPath, passengersPath, 
             booking_id: bookingId,
             leave_form: leaveFormPath,
             passengers: passengersPath,
-            drivers_license: driversLicensePath,
+            drivers: driversLicensePath,
         }]);
     
     if (error) throw error;
 }
 
 export async function addInspectorFiles(bookingId, pictures, action) {
-     const pictureObjects = pictures.map((path, index) => ({
+     const pictureObjects = {
         booking_id: bookingId,
-        picture_path: path,
-        picture_number: index + 1, // e.g., picture_1, picture_2
-        action: action,
-    }));
+        picture1: pictures[0] || null,
+        picture2: pictures[1] || null,
+        picture3: pictures[2] || null,
+        picture4: pictures[3] || null,
+        picture5: pictures[4] || null,
+        picture6: pictures[5] || null,
+        picture7: pictures[6]_ || null,
+        picture8: pictures[7] || null,
+     };
 
     const { error } = await supabase
         .from('pictures')
-        .insert(pictureObjects);
+        .insert([pictureObjects]);
 
     if (error) throw error;
 }

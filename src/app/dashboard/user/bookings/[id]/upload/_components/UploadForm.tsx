@@ -12,6 +12,7 @@ import { FileUp, FileCheck2 } from 'lucide-react'
 import { sendBookingConfirmation } from '@/ai/flows/send-booking-confirmation-flow'
 import { addBookingFiles } from '@/lib/services/uploads'
 import { supabase } from '@/lib/supabase/client'
+import { getOneBooking } from '@/lib/services/bookings'
 
 type FileUploadCardProps = {
     title: string;
@@ -102,13 +103,13 @@ export function UploadForm({ bookingId }: { bookingId: string }) {
 
             await addBookingFiles(bookingId, leaveUrl, passengersUrl, driversLicenseUrl);
 
-            const bookingDetails = await supabase.from('booking').select('user_name, user_email').eq('id', bookingId).single();
-            if(bookingDetails.error) throw bookingDetails.error;
+            const bookingDetails = await getOneBooking(bookingId);
+            if(!bookingDetails) throw new Error('Could not retrieve booking details.');
             
             await sendBookingConfirmation({
-                name: bookingDetails.data.user_name || 'Valued User',
-                email: bookingDetails.data.user_email || 'user@limpopo.ac.za',
-                reference: bookingId,
+                name: bookingDetails.user_name || 'Valued User',
+                email: bookingDetails.user_email || 'user@limpopo.ac.za',
+                reference: bookingDetails.reference,
             });
             
             toast({

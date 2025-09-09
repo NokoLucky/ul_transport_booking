@@ -5,8 +5,8 @@ export async function addLogbookKms(bookingId, kms, vehicle, logDate) {
         .from('logbook')
         .insert([{
             booking_id: bookingId,
-            kms_travelled: kms,
-            vehicle_registration: vehicle,
+            kms: kms,
+            vehicle: vehicle,
             log_date: logDate,
         }]);
     
