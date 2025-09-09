@@ -2,7 +2,7 @@ import { supabase } from '@/lib/supabase/client';
 
 export async function addBookingFiles(bookingId, leaveFormPath, passengersPath, driversLicensePath) {
     const { error } = await supabase
-        .from('UPLOADS')
+        .from('uploads')
         .insert([{
             booking_id: bookingId,
             leave_form: leaveFormPath,
@@ -22,7 +22,7 @@ export async function addInspectorFiles(bookingId, pictures, action) {
     }));
 
     const { error } = await supabase
-        .from('PICTURES')
+        .from('pictures')
         .insert(pictureObjects);
 
     if (error) throw error;

@@ -2,7 +2,7 @@ import { supabase } from '@/lib/supabase/client';
 
 export async function getStatus(reference) {
     const { data, error } = await supabase
-        .from('BOOKING')
+        .from('booking')
         .select('*')
         .eq('id', reference) // Assuming reference is the booking_id
         .single();

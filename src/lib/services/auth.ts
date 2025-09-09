@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 
 export async function adminLogin(username, password) {
   const { data, error } = await supabase
-    .from('ADMIN')
+    .from('admin')
     .select('id, password')
     .eq('username', username)
     .single();
@@ -16,7 +16,7 @@ export async function adminLogin(username, password) {
 
 export async function inspectorLogin(username, password) {
   const { data, error } = await supabase
-    .from('INSPECTOR')
+    .from('inspector')
     .select('id, password')
     .eq('username', username)
     .single();

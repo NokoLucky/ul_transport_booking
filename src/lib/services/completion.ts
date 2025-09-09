@@ -2,13 +2,13 @@ import { supabase } from '@/lib/supabase/client';
 
 export async function getCompletedBookings() {
     const { data, error } = await supabase
-        .from('ALLOCATES')
+        .from('allocates')
         .select(`
             *,
-            BOOKING (*),
-            DRIVERS (*)
+            booking (*),
+            drivers (*)
         `)
-        .eq('BOOKING.status', 'Awaiting Admin Approval');
+        .eq('booking.status', 'Awaiting Admin Approval');
     
     if (error) throw error;
     return data;
@@ -16,11 +16,11 @@ export async function getCompletedBookings() {
 
 export async function getOneCompletedBooking(allocateId) {
     const { data, error } = await supabase
-        .from('ALLOCATES')
+        .from('allocates')
         .select(`
             *,
-            BOOKING (*),
-            DRIVERS (*)
+            booking (*),
+            drivers (*)
         `)
         .eq('id', allocateId)
         .single();
@@ -31,9 +31,9 @@ export async function getOneCompletedBooking(allocateId) {
 
 export async function getCompletedBookingsCheckin() {
     const { data, error } = await supabase
-        .from('ALLOCATES')
+        .from('allocates')
         .select('*')
-        .eq('BOOKING.status', 'Completed');
+        .eq('booking.status', 'Completed');
 
     if (error) throw error;
     return data;
@@ -41,7 +41,7 @@ export async function getCompletedBookingsCheckin() {
 
 export async function getOneCompletedBookingCheckin(bookingId) {
     const { data, error } = await supabase
-        .from('ALLOCATES')
+        .from('allocates')
         .select('*')
         .eq('booking_id', bookingId)
         .eq('status', 'Completed')

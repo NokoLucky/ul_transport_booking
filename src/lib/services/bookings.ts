@@ -2,7 +2,7 @@ import { supabase } from '@/lib/supabase/client';
 
 export async function addBooking(bookingDetails) {
   const { data, error } = await supabase
-    .from('BOOKING')
+    .from('booking')
     .insert([bookingDetails])
     .select('id');
     
@@ -12,7 +12,7 @@ export async function addBooking(bookingDetails) {
 
 export async function bookingExists(userEmail) {
   const { data, error, count } = await supabase
-    .from('BOOKING')
+    .from('booking')
     .select('*', { count: 'exact', head: true })
     .eq('user_email', userEmail);
 
@@ -22,10 +22,10 @@ export async function bookingExists(userEmail) {
 
 export async function getBookings() {
   const { data, error } = await supabase
-    .from('BOOKING')
+    .from('booking')
     .select(`
       *,
-      UPLOADS (*)
+      uploads (*)
     `)
     .eq('status', 'In Progress');
 
@@ -35,7 +35,7 @@ export async function getBookings() {
 
 export async function getOneBooking(bookingId) {
   const { data, error } = await supabase
-    .from('BOOKING')
+    .from('booking')
     .select('*')
     .eq('id', bookingId)
     .single();
@@ -46,7 +46,7 @@ export async function getOneBooking(bookingId) {
 
 export async function getInspectorBookings() {
   const { data, error } = await supabase
-    .from('BOOKING')
+    .from('booking')
     .select('*')
     .eq('status', 'Allocating');
     
@@ -60,7 +60,7 @@ export async function getInspectorOneBooking(bookingId) {
 
 export async function updateBookingStatus(bookingId, status) {
     const { error } = await supabase
-        .from('BOOKING')
+        .from('booking')
         .update({ status })
         .eq('id', bookingId);
     
@@ -69,7 +69,7 @@ export async function updateBookingStatus(bookingId, status) {
 
 export async function deleteBooking(bookingId) {
     const { error } = await supabase
-        .from('BOOKING')
+        .from('booking')
         .delete()
         .eq('id', bookingId);
 

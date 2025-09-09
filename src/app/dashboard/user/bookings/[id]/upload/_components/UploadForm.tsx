@@ -102,7 +102,7 @@ export function UploadForm({ bookingId }: { bookingId: string }) {
 
             await addBookingFiles(bookingId, leaveUrl, passengersUrl, driversLicenseUrl);
 
-            const bookingDetails = await supabase.from('BOOKING').select('user_name, user_email').eq('id', bookingId).single();
+            const bookingDetails = await supabase.from('booking').select('user_name, user_email').eq('id', bookingId).single();
             if(bookingDetails.error) throw bookingDetails.error;
             
             await sendBookingConfirmation({
@@ -117,11 +117,11 @@ export function UploadForm({ bookingId }: { bookingId: string }) {
             })
             router.push('/dashboard/user')
 
-        } catch (error) {
+        } catch (error: any) {
             console.error("Upload process error:", error);
             toast({
                 title: "Upload Failed",
-                description: "There was an error uploading your files. Please try again.",
+                description: error.message || "There was an error uploading your files. Please try again.",
                 variant: "destructive",
             });
         } finally {

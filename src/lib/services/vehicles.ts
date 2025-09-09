@@ -2,7 +2,7 @@ import { supabase } from '@/lib/supabase/client';
 
 export async function getVehicles(category) {
   const { data, error } = await supabase
-    .from('VEHICLES')
+    .from('vehicles')
     .select('*')
     .eq('category', category)
     .eq('status', 'Unallocated');
@@ -13,7 +13,7 @@ export async function getVehicles(category) {
 
 export async function updateVehicleStatus(registration, vehicleStatus) {
   const { error } = await supabase
-    .from('VEHICLES')
+    .from('vehicles')
     .update({ status: vehicleStatus })
     .eq('registration', registration);
 
@@ -22,7 +22,7 @@ export async function updateVehicleStatus(registration, vehicleStatus) {
 
 export async function getDrivers() {
     const { data, error } = await supabase
-        .from('DRIVERS')
+        .from('drivers')
         .select('*')
         .eq('status', 'Unassigned');
 
