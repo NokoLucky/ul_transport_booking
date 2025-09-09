@@ -60,12 +60,13 @@ export async function getInspectorOneBooking(bookingId) {
 }
 
 export async function updateBookingStatus(bookingId, status) {
-    const { error } = await supabase
+    const { data, error } = await supabase
         .from('booking')
         .update({ status })
         .eq('id', bookingId);
     
     if (error) throw error;
+    return data;
 }
 
 export async function deleteBooking(bookingId) {

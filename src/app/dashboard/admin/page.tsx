@@ -19,8 +19,9 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
-import { getBookings } from '@/lib/services/bookings';
+import { getBookings, updateBookingStatus } from '@/lib/services/bookings';
 import { getCompletedBookings } from '@/lib/services/completion';
+import { useToast } from '@/hooks/use-toast';
 
 // A helper function to extract filename from a URL
 const getFileName = (url: string | null | undefined): string => {
@@ -40,6 +41,7 @@ export default function AdminDashboard() {
   const [completedBookings, setCompletedBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     async function fetchData() {
@@ -62,6 +64,46 @@ export default function AdminDashboard() {
     }
     fetchData();
   }, []);
+
+  const handleCheckAvailability = async (bookingId: string) => {
+    try {
+      await updateBookingStatus(bookingId, 'Allocating');
+      setNewBookings((prev) => prev.filter((b) => b.id !== bookingId));
+      toast({
+        title: 'Request Sent to Inspector',
+        description: 'The booking is now awaiting vehicle allocation.',
+      });
+    } catch (error: any) {
+      console.error('Failed to update booking status:', error);
+      toast({
+        title: 'Update Failed',
+        description: 'Could not send the request to the inspector. Please try again.',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleReject = async (bookingId: string) => {
+     if (confirm('Are you sure you want to reject this application?')) {
+        try {
+            await updateBookingStatus(bookingId, 'Rejected');
+            setNewBookings((prev) => prev.filter((b) => b.id !== bookingId));
+            toast({
+                title: 'Booking Rejected',
+                description: 'The booking request has been rejected.',
+                variant: 'destructive'
+            });
+        } catch (error) {
+             console.error('Failed to reject booking:', error);
+             toast({
+                title: 'Rejection Failed',
+                description: 'Could not reject the booking. Please try again.',
+                variant: 'destructive'
+            });
+        }
+    }
+  }
+
 
   if (loading) {
       return <div className="text-center p-8">Loading dashboard...</div>
@@ -127,8 +169,8 @@ export default function AdminDashboard() {
                                 </TableCell>
                                 <TableCell>
                                     <div className="flex gap-2">
-                                        <Button size="sm" onClick={() => alert('Proceeding to check availability...')}>Check Availability</Button>
-                                        <Button size="sm" variant="destructive" onClick={() => confirm('Are you sure you want to reject this application?')}>Reject</Button>
+                                        <Button size="sm" onClick={() => handleCheckAvailability(booking.id)}>Check Availability</Button>
+                                        <Button size="sm" variant="destructive" onClick={() => handleReject(booking.id)}>Reject</Button>
                                     </div>
                                 </TableCell>
                             </TableRow>
