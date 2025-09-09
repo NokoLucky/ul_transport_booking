@@ -46,8 +46,7 @@ const formSchema = z.object({
   userMobile: z.string().max(10, "Mobile number can be at most 10 characters"),
   userEmail: z.string().email("Invalid email address"),
   vehicleType: z.string().min(1, "Please select a vehicle type."),
-  ownDriver: z.enum(["Yes", "No"]).default("No"),
-
+  
   // Department Info
   department: z.string().min(1, "Department is required"),
   building: z.string().min(1, "Building is required"),
@@ -77,14 +76,6 @@ const formSchema = z.object({
   departDateTime: z.date(),
   returnDateTime: z.date(),
   tripDescription: z.string().optional(),
-}).refine(data => {
-    if (data.ownDriver === 'Yes') {
-        return !!data.driverFirstName && !!data.driverSurname && !!data.driverStaffNo && !!data.driverMobile && !!data.driverJobType && !!data.driverLicenseIssue && !!data.driverLicenseExpiry;
-    }
-    return true;
-}, {
-    message: "Driver information is required when you select 'Yes'.",
-    path: ["driverFirstName"], // you can pick any of the driver fields
 });
 
 export function BookingForm() {
@@ -99,7 +90,6 @@ export function BookingForm() {
       userStaffNo: "",
       userMobile: "",
       userEmail: "",
-      ownDriver: "No",
       department: "",
       building: "",
       officeNo: "",
@@ -113,8 +103,6 @@ export function BookingForm() {
     },
   })
   
-  const ownDriverValue = form.watch("ownDriver");
-
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
         const reference = `ULTRANS${crypto.randomBytes(3).toString('hex').toUpperCase()}`;
@@ -126,7 +114,6 @@ export function BookingForm() {
             user_mobile: values.userMobile,
             user_email: values.userEmail,
             car_type: values.vehicleType,
-            own_driver: values.ownDriver,
             department: values.department,
             building: values.building,
             officeno: values.officeNo,
@@ -231,36 +218,6 @@ export function BookingForm() {
                             </FormItem>
                         )}
                         />
-                     <FormField
-                        control={form.control}
-                        name="ownDriver"
-                        render={({ field }) => (
-                            <FormItem className="space-y-3">
-                            <FormLabel>Do you have your own driver?</FormLabel>
-                            <FormControl>
-                                <RadioGroup
-                                onValueChange={field.onChange}
-                                defaultValue={field.value}
-                                className="flex items-center space-x-4"
-                                >
-                                <FormItem className="flex items-center space-x-2 space-y-0">
-                                    <FormControl>
-                                    <RadioGroupItem value="Yes" />
-                                    </FormControl>
-                                    <FormLabel className="font-normal">Yes</FormLabel>
-                                </FormItem>
-                                <FormItem className="flex items-center space-x-2 space-y-0">
-                                    <FormControl>
-                                    <RadioGroupItem value="No" />
-                                    </FormControl>
-                                    <FormLabel className="font-normal">No</FormLabel>
-                                </FormItem>
-                                </RadioGroup>
-                            </FormControl>
-                            <FormMessage />
-                            </FormItem>
-                        )}
-                        />
                 </AccordionContent>
             </AccordionItem>
 
@@ -285,50 +242,48 @@ export function BookingForm() {
                 </AccordionContent>
             </AccordionItem>
 
-             {/* Driver Information (Conditional) */}
-            {ownDriverValue === 'Yes' && (
-                <AccordionItem value="driver-info">
-                    <AccordionTrigger className="text-xl font-semibold">Driver Information</AccordionTrigger>
-                    <AccordionContent className="p-4 space-y-8">
-                         <div className="grid md:grid-cols-2 gap-8">
-                            <FormField control={form.control} name="driverFirstName" render={({ field }) => (
-                                <FormItem><FormLabel>Driver First Name</FormLabel><FormControl><Input placeholder="Driver's first name" {...field} /></FormControl><FormMessage /></FormItem>
-                            )} />
-                            <FormField control={form.control} name="driverSurname" render={({ field }) => (
-                                <FormItem><FormLabel>Driver Surname</FormLabel><FormControl><Input placeholder="Driver's surname" {...field} /></FormControl><FormMessage /></FormItem>
-                            )} />
-                        </div>
-                        <div className="grid md:grid-cols-2 gap-8">
-                            <FormField control={form.control} name="driverStaffNo" render={({ field }) => (
-                                <FormItem><FormLabel>Driver Staff No.</FormLabel><FormControl><Input placeholder="Driver's staff number" {...field} /></FormControl><FormMessage /></FormItem>
-                            )} />
-                            <FormField control={form.control} name="driverMobile" render={({ field }) => (
-                                <FormItem><FormLabel>Driver Mobile No.</FormLabel><FormControl><Input type="tel" placeholder="Driver's mobile" {...field} /></FormControl><FormMessage /></FormItem>
-                            )} />
-                        </div>
-                        <FormField control={form.control} name="driverJobType" render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Driver Job Type</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select driver's job type" /></SelectTrigger></FormControl>
-                                <SelectContent>
-                                    <SelectItem value="Permanent">Permanent</SelectItem>
-                                    <SelectItem value="Temporary">Temporary</SelectItem>
-                                    <SelectItem value="Contractor">Contractor</SelectItem>
-                                </SelectContent>
-                                </Select><FormMessage />
-                            </FormItem>
+             {/* Driver Information */}
+            <AccordionItem value="driver-info">
+                <AccordionTrigger className="text-xl font-semibold">Driver Information (Optional)</AccordionTrigger>
+                <AccordionContent className="p-4 space-y-8">
+                     <div className="grid md:grid-cols-2 gap-8">
+                        <FormField control={form.control} name="driverFirstName" render={({ field }) => (
+                            <FormItem><FormLabel>Driver First Name</FormLabel><FormControl><Input placeholder="Driver's first name" {...field} /></FormControl><FormMessage /></FormItem>
                         )} />
-                        <div className="grid md:grid-cols-2 gap-8">
-                            <FormField control={form.control} name="driverLicenseIssue" render={({ field }) => (
-                                <FormItem className="flex flex-col"><FormLabel>License Issue Date</FormLabel><Popover><PopoverTrigger asChild><FormControl><Button variant={"outline"} className={cn("w-full justify-start text-left font-normal", !field.value && "text-muted-foreground")}><CalendarIcon className="mr-2 h-4 w-4" />{field.value ? format(field.value, "PPP") : <span>Pick a date</span>}</Button></FormControl></PopoverTrigger><PopoverContent className="w-auto p-0"><Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus /></PopoverContent></Popover><FormMessage /></FormItem>
-                            )} />
-                             <FormField control={form.control} name="driverLicenseExpiry" render={({ field }) => (
-                                <FormItem className="flex flex-col"><FormLabel>License Expiry Date</FormLabel><Popover><PopoverTrigger asChild><FormControl><Button variant={"outline"} className={cn("w-full justify-start text-left font-normal", !field.value && "text-muted-foreground")}><CalendarIcon className="mr-2 h-4 w-4" />{field.value ? format(field.value, "PPP") : <span>Pick a date</span>}</Button></FormControl></PopoverTrigger><PopoverContent className="w-auto p-0"><Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus /></PopoverContent></Popover><FormMessage /></FormItem>
-                            )} />
-                        </div>
-                    </AccordionContent>
-                </AccordionItem>
-            )}
+                        <FormField control={form.control} name="driverSurname" render={({ field }) => (
+                            <FormItem><FormLabel>Driver Surname</FormLabel><FormControl><Input placeholder="Driver's surname" {...field} /></FormControl><FormMessage /></FormItem>
+                        )} />
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-8">
+                        <FormField control={form.control} name="driverStaffNo" render={({ field }) => (
+                            <FormItem><FormLabel>Driver Staff No.</FormLabel><FormControl><Input placeholder="Driver's staff number" {...field} /></FormControl><FormMessage /></FormItem>
+                        )} />
+                        <FormField control={form.control} name="driverMobile" render={({ field }) => (
+                            <FormItem><FormLabel>Driver Mobile No.</FormLabel><FormControl><Input type="tel" placeholder="Driver's mobile" {...field} /></FormControl><FormMessage /></FormItem>
+                        )} />
+                    </div>
+                    <FormField control={form.control} name="driverJobType" render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Driver Job Type</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select driver's job type" /></SelectTrigger></FormControl>
+                            <SelectContent>
+                                <SelectItem value="Permanent">Permanent</SelectItem>
+                                <SelectItem value="Temporary">Temporary</SelectItem>
+                                <SelectItem value="Contractor">Contractor</SelectItem>
+                            </SelectContent>
+                            </Select><FormMessage />
+                        </FormItem>
+                    )} />
+                    <div className="grid md:grid-cols-2 gap-8">
+                        <FormField control={form.control} name="driverLicenseIssue" render={({ field }) => (
+                            <FormItem className="flex flex-col"><FormLabel>License Issue Date</FormLabel><Popover><PopoverTrigger asChild><FormControl><Button variant={"outline"} className={cn("w-full justify-start text-left font-normal", !field.value && "text-muted-foreground")}><CalendarIcon className="mr-2 h-4 w-4" />{field.value ? format(field.value, "PPP") : <span>Pick a date</span>}</Button></FormControl></PopoverTrigger><PopoverContent className="w-auto p-0"><Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus /></PopoverContent></Popover><FormMessage /></FormItem>
+                        )} />
+                         <FormField control={form.control} name="driverLicenseExpiry" render={({ field }) => (
+                            <FormItem className="flex flex-col"><FormLabel>License Expiry Date</FormLabel><Popover><PopoverTrigger asChild><FormControl><Button variant={"outline"} className={cn("w-full justify-start text-left font-normal", !field.value && "text-muted-foreground")}><CalendarIcon className="mr-2 h-4 w-4" />{field.value ? format(field.value, "PPP") : <span>Pick a date</span>}</Button></FormControl></PopoverTrigger><PopoverContent className="w-auto p-0"><Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus /></PopoverContent></Popover><FormMessage /></FormItem>
+                        )} />
+                    </div>
+                </AccordionContent>
+            </AccordionItem>
 
             {/* Cost Centre Information */}
             <AccordionItem value="cost-info">

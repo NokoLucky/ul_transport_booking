@@ -59,7 +59,6 @@ export function UploadForm({ bookingId }: { bookingId: string }) {
     const { toast } = useToast()
     
     // In a real app, you would fetch the booking details to determine which documents are required.
-    const isOwnDriver = true; // This would come from booking details
     const hasPassengers = true; // This would also come from booking details
     
     const [files, setFiles] = useState<{ [key: string]: File | null }>({
@@ -151,15 +150,13 @@ export function UploadForm({ bookingId }: { bookingId: string }) {
                     />
                 )}
 
-                {isOwnDriver && (
-                     <FileUploadCard 
-                        title="Drivers License (if own driver)"
-                        description="Driver's License"
-                        fileId="driversLicense"
-                        fileName={files.driversLicense?.name || null}
-                        handleFileChange={handleFileChange}
-                    />
-                )}
+                <FileUploadCard 
+                    title="Drivers License (if own driver)"
+                    description="Driver's License"
+                    fileId="driversLicense"
+                    fileName={files.driversLicense?.name || null}
+                    handleFileChange={handleFileChange}
+                />
             </div>
 
             <Card>
