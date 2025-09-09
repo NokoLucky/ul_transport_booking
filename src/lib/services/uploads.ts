@@ -14,7 +14,7 @@ export async function addBookingFiles(bookingId: string, leaveFormPath: string |
     if (error) throw error;
 }
 
-export async function addInspectorFiles(bookingId: string, pictures: (string | null)[]) {
+export async function addInspectorFiles(bookingId: string, pictures: (string | null)[], action: string) {
      const pictureObjects = {
         booking_id: bookingId,
         picture1: pictures[0] || null,
@@ -25,6 +25,7 @@ export async function addInspectorFiles(bookingId: string, pictures: (string | n
         picture6: pictures[5] || null,
         picture7: pictures[6] || null,
         picture8: pictures[7] || null,
+        action: action,
      };
 
     const { error } = await supabase
