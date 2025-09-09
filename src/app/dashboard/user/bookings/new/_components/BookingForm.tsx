@@ -146,11 +146,11 @@ export function BookingForm() {
         } else {
             throw new Error("Failed to get booking ID.");
         }
-    } catch (error) {
+    } catch (error: any) {
         console.error("Booking submission error:", error);
         toast({
             title: "Submission Failed",
-            description: "There was an error saving your booking. Please try again.",
+            description: error.message || "There was an error saving your booking. Please try again.",
             variant: "destructive",
         });
     }
