@@ -167,8 +167,11 @@ export function AllocationForm({ booking }: { booking: any }) {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
-        const registration = values.vehicle.split(' - ')[2]?.trim();
-        if (!registration) throw new Error("Invalid vehicle selection format.");
+        const registration = values.vehicle;
+        if (!registration) throw new Error("Invalid vehicle selection.");
+        
+        const selectedVehicle = vehicles.find(v => v.registration === registration);
+        if (!selectedVehicle) throw new Error("Could not find selected vehicle details.");
 
         let assignedDriverId = null;
         if (!booking.driver_name) {
@@ -183,7 +186,7 @@ export function AllocationForm({ booking }: { booking: any }) {
         }
 
         const allocationData = {
-            vehicle: values.vehicle,
+            vehicle: `${selectedVehicle.description} - ${selectedVehicle.registration}`,
             kms: values.kms,
             disk_expiry: format(values.disk_expiry, "yyyy-MM-dd"),
             remarks: values.remarks,
@@ -245,7 +248,7 @@ export function AllocationForm({ booking }: { booking: any }) {
                             </FormControl>
                             <SelectContent>
                                 {vehicles.map((v) => (
-                                    <SelectItem key={v.id} value={`${v.description} - ${v.registration}`}>
+                                    <SelectItem key={v.id} value={v.registration}>
                                         {v.description} - {v.registration}
                                     </SelectItem>
                                 ))}
@@ -383,3 +386,5 @@ export function AllocationForm({ booking }: { booking: any }) {
     </Form>
   )
 }
+
+    
