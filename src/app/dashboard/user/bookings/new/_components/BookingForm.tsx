@@ -1,18 +1,17 @@
+
 'use client'
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { format } from "date-fns"
-import { CalendarIcon, Car, Users, Building, School, User, Phone, Hash, Mail, ShieldCheck } from "lucide-react"
-
+import { CalendarIcon, Car, Users } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -36,10 +35,12 @@ import { Textarea } from "@/components/ui/textarea"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { useToast } from "@/hooks/use-toast"
 import { useRouter } from "next/navigation"
+import { addBooking } from "@/lib/services/bookings"
 
 const formSchema = z.object({
   // User Info
   userName: z.string().min(1, "Full name is required"),
+  userSurname: z.string().min(1, "Surname is required"),
   userStaffNo: z.string().max(8, "Staff number can be at most 8 characters"),
   userMobile: z.string().max(10, "Mobile number can be at most 10 characters"),
   userEmail: z.string().email("Invalid email address"),
@@ -87,6 +88,7 @@ export function BookingForm() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       userName: "",
+      userSurname: "",
       userStaffNo: "",
       userMobile: "",
       userEmail: "",
@@ -102,15 +104,56 @@ export function BookingForm() {
   
   const ownDriverValue = form.watch("ownDriver");
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values)
-    // In a real app, you would save the booking and get an ID
-    const mockBookingId = "BK" + Math.floor(Math.random() * 1000);
-    toast({
-      title: "Booking Details Saved!",
-      description: "Please upload the required documents to finalize your request.",
-    })
-    router.push(`/dashboard/user/bookings/${mockBookingId}/upload`);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+        const bookingData = {
+            user_name: values.userName,
+            user_surname: values.userSurname,
+            user_staffno: values.userStaffNo,
+            user_mobile: values.userMobile,
+            user_email: values.userEmail,
+            car_type: values.vehicleType,
+            own_driver: values.ownDriver,
+            department: values.department,
+            building: values.building,
+            officeno: values.officeNo,
+            division: values.schoolDivision,
+            driver_name: values.driverFirstName,
+            driver_surname: values.driverSurname,
+            driver_staffno: values.driverStaffNo,
+            driver_mobile: values.driverMobile,
+            driver_jobtype: values.driverJobType,
+            license_issue: values.driverLicenseIssue ? format(values.driverLicenseIssue, 'yyyy-MM-dd') : null,
+            license_expiry: values.driverLicenseExpiry ? format(values.driverLicenseExpiry, 'yyyy-MM-dd') : null,
+            destination: values.destination,
+            distance: values.estimatedDistance,
+            purpose: values.purpose,
+            passengersno: values.passengers,
+            depart_date: values.departDateTime ? format(values.departDateTime, "yyyy-MM-dd'T'HH:mm:ss") : null,
+            return_date: values.returnDateTime ? format(values.returnDateTime, "yyyy-MM-dd'T'HH:mm:ss") : null,
+            description: values.tripDescription,
+            status: 'In Progress'
+        };
+
+        const bookingId = await addBooking(bookingData);
+
+        if (bookingId) {
+            toast({
+                title: "Booking Details Saved!",
+                description: "Please upload the required documents to finalize your request.",
+            });
+            router.push(`/dashboard/user/bookings/${bookingId}/upload`);
+        } else {
+            throw new Error("Failed to get booking ID.");
+        }
+    } catch (error) {
+        console.error("Booking submission error:", error);
+        toast({
+            title: "Submission Failed",
+            description: "There was an error saving your booking. Please try again.",
+            variant: "destructive",
+        });
+    }
   }
 
   return (
@@ -121,9 +164,14 @@ export function BookingForm() {
             <AccordionItem value="user-info">
                 <AccordionTrigger className="text-xl font-semibold">User Information</AccordionTrigger>
                 <AccordionContent className="p-4 space-y-8">
-                    <FormField control={form.control} name="userName" render={({ field }) => (
-                        <FormItem><FormLabel>Full Name</FormLabel><FormControl><Input placeholder="John Doe" {...field} /></FormControl><FormMessage /></FormItem>
-                    )} />
+                     <div className="grid md:grid-cols-2 gap-8">
+                        <FormField control={form.control} name="userName" render={({ field }) => (
+                            <FormItem><FormLabel>First Name</FormLabel><FormControl><Input placeholder="John" {...field} /></FormControl><FormMessage /></FormItem>
+                        )} />
+                        <FormField control={form.control} name="userSurname" render={({ field }) => (
+                            <FormItem><FormLabel>Surname</FormLabel><FormControl><Input placeholder="Doe" {...field} /></FormControl><FormMessage /></FormItem>
+                        )} />
+                    </div>
                      <div className="grid md:grid-cols-2 gap-8">
                         <FormField control={form.control} name="userStaffNo" render={({ field }) => (
                             <FormItem><FormLabel>Staff No.</FormLabel><FormControl><Input placeholder="12345678" {...field} /></FormControl><FormMessage /></FormItem>
@@ -232,7 +280,7 @@ export function BookingForm() {
                                 <FormItem><FormLabel>Driver Surname</FormLabel><FormControl><Input placeholder="Driver's surname" {...field} /></FormControl><FormMessage /></FormItem>
                             )} />
                         </div>
-                        <div className="grid md-grid-cols-2 gap-8">
+                        <div className="grid md:grid-cols-2 gap-8">
                             <FormField control={form.control} name="driverStaffNo" render={({ field }) => (
                                 <FormItem><FormLabel>Driver Staff No.</FormLabel><FormControl><Input placeholder="Driver's staff number" {...field} /></FormControl><FormMessage /></FormItem>
                             )} />
