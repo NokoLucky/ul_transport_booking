@@ -159,6 +159,7 @@ export default function InspectorDashboard() {
                                     </TableHeader>
                                     <TableBody>
                                         {checkInBookings.length > 0 ? checkInBookings.map((comp) => (
+                                            comp.booking && (
                                             <TableRow key={comp.id}>
                                                 <TableCell>
                                                     <div className="font-medium">{comp.booking.user_name} {comp.booking.user_surname}</div>
@@ -172,6 +173,7 @@ export default function InspectorDashboard() {
                                                     <Button size="sm">Check In</Button>
                                                 </TableCell>
                                             </TableRow>
+                                            )
                                         )) : (
                                             <TableRow>
                                                 <TableCell colSpan={6} className="text-center">No new check-in requests found.</TableCell>

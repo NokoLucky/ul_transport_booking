@@ -207,7 +207,8 @@ export default function AdminDashboard() {
                         </TableHeader>
                         <TableBody>
                         {completedBookings.length > 0 ? completedBookings.map((comp) => (
-                           <TableRow key={comp.id}>
+                           comp.booking && (
+                            <TableRow key={comp.id}>
                                <TableCell>
                                     <div className="font-medium">{comp.booking.user_name} {comp.booking.user_surname}</div>
                                     <div className="text-sm text-muted-foreground">Staff: {comp.booking.user_staffno} | {comp.booking.user_mobile}</div>
@@ -221,6 +222,7 @@ export default function AdminDashboard() {
                                    <Button size="sm" onClick={() => alert('Sending confirmation...')}>Send Confirmation</Button>
                                </TableCell>
                            </TableRow>
+                           )
                         )) : (
                             <TableRow>
                                 <TableCell colSpan={4} className="text-center">No inspector-completed applications found.</TableCell>
