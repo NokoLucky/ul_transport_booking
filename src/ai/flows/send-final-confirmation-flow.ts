@@ -8,8 +8,11 @@
  */
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import { Resend } from 'resend';
 import { updateBookingStatus } from '@/lib/services/bookings';
 import { updateVehicleStatus } from '@/lib/services/vehicles';
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const SendFinalConfirmationInputSchema = z.object({
   clientName: z.string().describe('The name of the user who made the booking.'),
@@ -33,74 +36,62 @@ export type SendFinalConfirmationInput = z.infer<
 const clientEmailNoDriverPrompt = ai.definePrompt({
     name: 'clientEmailNoDriverPrompt',
     input: { schema: SendFinalConfirmationInputSchema },
-    prompt: `
-      To: {{{clientEmail}}}
-      Subject: Booking Approved
+    prompt: `Hi {{{clientName}}},
 
-      Hi {{{clientName}}},
-
-      We are excited to inform you that your booking has been approved. Below are the vehicle details.
+We are excited to inform you that your booking has been approved. Below are the vehicle details.
       
-      Vehicle: {{{vehicleDetails}}}
+Vehicle: **{{{vehicleDetails}}}**
 
-      Please come and collect the vehicle at the transport section 30 minutes prior to your departure time, which is at {{departDateTime}}.
+Please come and collect the vehicle at the transport section 30 minutes prior to your departure time, which is at **{{departDateTime}}**.
       
-      NB: Collection of vehicles on weekdays will be between 7:30 and 16:00, and on weekends between 8:00 and 12:00.
+NB: Collection of vehicles on weekdays will be between 7:30 and 16:00, and on weekends between 8:00 and 12:00.
       
-      Please make sure to log a vehicle return on this link upon your return date, which is at: {{returnDateTime}}.
-      (Note: Link functionality to be implemented in a future step for allocate_id: {{allocationId}})
+Please make sure to log a vehicle return on this link upon your return date, which is at: **{{returnDateTime}}**.
+(Note: Link functionality to be implemented in a future step for allocate_id: {{allocationId}})
 
-      Kind Regards,
-      UL Transport Management
+Kind Regards,
+UL Transport Management
     `
 });
 
 const clientEmailWithDriverPrompt = ai.definePrompt({
     name: 'clientEmailWithDriverPrompt',
     input: { schema: SendFinalConfirmationInputSchema },
-    prompt: `
-      To: {{{clientEmail}}}
-      Subject: Booking Approved
+    prompt: `Hi {{{clientName}}},
 
-      Hi {{{clientName}}},
-
-      We are excited to inform you that your booking has been approved.
+We are excited to inform you that your booking has been approved.
       
-      Your allocated vehicle details are as follows: {{{vehicleDetails}}}
+Your allocated vehicle details are as follows: **{{{vehicleDetails}}}**
       
-      Your assigned driver details are as follows:
-      Name: {{driver.name}}
-      Contact: {{driver.mobile}}
+Your assigned driver details are as follows:
+Name: **{{driver.name}}**
+Contact: **{{driver.mobile}}**
 
-      Please meet your designated driver at the student centre 30 minutes prior to departure time, which is at: {{departDateTime}}.
+Please meet your designated driver at the student centre 30 minutes prior to departure time, which is at: **{{departDateTime}}**.
       
-      NB: Driver waiting period is 15 minutes maximum. If you are not at the meeting point by that period, the trip may be cancelled.
+NB: Driver waiting period is 15 minutes maximum. If you are not at the meeting point by that period, the trip may be cancelled.
 
-      Kind Regards,
-      UL Transport Management
+Kind Regards,
+UL Transport Management
     `
 });
 
 const driverEmailPrompt = ai.definePrompt({
     name: 'driverEmailPrompt',
     input: { schema: SendFinalConfirmationInputSchema },
-    prompt: `
-      To: {{driver.email}}
-      Subject: New Trip Assigned
+    prompt: `Hi {{driver.name}},
 
-      Hi {{driver.name}},
-
-      You have been assigned a new trip.
+You have been assigned a new trip.
       
-      Client: {{{clientName}}}
-      Vehicle: {{{vehicleDetails}}}
-      Departure: {{departDateTime}}
-      Return: {{returnDateTime}}
+Client: **{{{clientName}}}**
+Vehicle: **{{{vehicleDetails}}}**
+Departure: **{{departDateTime}}**
+Return: **{{returnDateTime}}**
 
-      Please meet the client at the student centre 30 minutes prior to the departure time.
+Please meet the client at the student centre 30 minutes prior to the departure time.
 
-      Kind Regards,
-      UL Transport Management
+Kind Regards,
+UL Transport Management
     `
 });
 
@@ -112,17 +103,38 @@ export const sendFinalConfirmationFlow = ai.defineFlow(
   },
   async (input) => {
     
-    // 1. Generate and "send" email to the client
+    // 1. Generate and send email to the client
     const clientPrompt = input.driver?.name ? clientEmailWithDriverPrompt : clientEmailNoDriverPrompt;
     const clientEmailContent = await clientPrompt(input);
-    console.log(`SIMULATED CLIENT EMAIL SENT to ${input.clientEmail}`);
-    console.log('Client Email Body:', clientEmailContent.text);
 
-    // 2. Generate and "send" email to the driver if one is assigned
+    try {
+        await resend.emails.send({
+            from: 'UL Transport <onboarding@resend.dev>',
+            to: input.clientEmail,
+            subject: 'Booking Approved',
+            text: clientEmailContent.text
+        });
+        console.log(`Client confirmation email sent to ${input.clientEmail}`);
+    } catch (error) {
+        console.error(`Failed to send client email to ${input.clientEmail}`, error);
+        // Depending on requirements, we might want to stop the flow here
+    }
+
+
+    // 2. Generate and send email to the driver if one is assigned
     if (input.driver?.name && input.driver?.email) {
         const driverEmailContent = await driverEmailPrompt(input);
-        console.log(`SIMULATED DRIVER EMAIL SENT to ${input.driver.email}`);
-        console.log('Driver Email Body:', driverEmailContent.text);
+        try {
+            await resend.emails.send({
+                from: 'UL Transport <onboarding@resend.dev>',
+                to: input.driver.email,
+                subject: 'New Trip Assigned',
+                text: driverEmailContent.text
+            });
+            console.log(`Driver confirmation email sent to ${input.driver.email}`);
+        } catch (error) {
+            console.error(`Failed to send driver email to ${input.driver.email}`, error);
+        }
     }
     
     // 3. Update statuses in the database

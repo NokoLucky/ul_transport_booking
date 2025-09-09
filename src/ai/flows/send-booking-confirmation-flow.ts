@@ -8,6 +8,9 @@
  */
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import { Resend } from 'resend';
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const SendBookingConfirmationInputSchema = z.object({
   name: z.string().describe('The name of the user who made the booking.'),
@@ -22,20 +25,16 @@ export type SendBookingConfirmationInput = z.infer<
 const emailPrompt = ai.definePrompt({
     name: 'bookingEmailPrompt',
     input: { schema: SendBookingConfirmationInputSchema },
-    prompt: `
-      To: {{{email}}}
-      Subject: Booking Confirmation
+    prompt: `Hi {{{name}}},
 
-      Hi {{{name}}},
+This email serves as a notice that you have successfully requested a booking for a vehicle. Please be patient while we are processing your booking.
 
-      This email serves as a notice that you have successfully requested a booking for a vehicle. Please be patient while we are processing your booking.
-
-      Below is your reference code which can be used to check status on our system.
+Below is your reference code which can be used to check status on our system.
       
-      {{reference}}
+**{{reference}}**
 
-      Kind Regards,
-      UL Transport Management
+Kind Regards,
+UL Transport Management
     `
 });
 
@@ -47,12 +46,22 @@ export const sendBookingConfirmationFlow = ai.defineFlow(
   },
   async (input) => {
     
-    // In a real application, you would integrate with an email sending service here.
-    // For now, we will simulate sending the email by generating the content.
-    const emailContent = await emailPrompt(input);
+    const emailBody = await emailPrompt(input);
 
-    console.log(`SIMULATED EMAIL SENT to ${input.email} for reference ${input.reference}`);
-    console.log('Email Body:', emailContent.text);
+    try {
+        await resend.emails.send({
+            from: 'UL Transport <onboarding@resend.dev>',
+            to: input.email,
+            subject: 'Booking Confirmation',
+            text: emailBody.text,
+        });
+        console.log(`Booking confirmation email sent to ${input.email}`);
+    } catch (error) {
+        console.error("Failed to send booking confirmation email:", error);
+        // We can decide if this should be a hard failure or not.
+        // For now, we'll let it fail silently in the background but log the error.
+        // In a production app, you'd want more robust error handling/retry logic.
+    }
     
     return { success: true };
   }
