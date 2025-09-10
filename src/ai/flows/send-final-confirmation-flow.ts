@@ -105,16 +105,26 @@ export const sendFinalConfirmationFlow = ai.defineFlow(
     
     // 1. Generate and send email to the client
     const clientPrompt = input.driver?.name ? clientEmailWithDriverPrompt : clientEmailNoDriverPrompt;
-    const clientEmailContent = await clientPrompt(input);
+    const clientEmailResponse = await clientPrompt(input);
+    const clientEmailBody = clientEmailResponse.text;
 
     try {
-        await resend.emails.send({
+        console.log(`Attempting to send client confirmation to ${input.clientEmail}`);
+        const { data, error } = await resend.emails.send({
             from: 'UL Transport <onboarding@resend.dev>',
             to: input.clientEmail,
             subject: 'Booking Approved',
-            text: clientEmailContent.text
+            text: clientEmailBody
         });
-        console.log(`Client confirmation email sent to ${input.clientEmail}`);
+
+        if (error) {
+          console.error("Resend API error (client email):", error);
+          throw new Error(`Failed to send client email: ${JSON.stringify(error)}`);
+        }
+
+        console.log("Resend API success response (client email):", data);
+        console.log(`Client confirmation email sent successfully to ${input.clientEmail}`);
+
     } catch (error) {
         console.error(`Failed to send client email to ${input.clientEmail}`, error);
         // Re-throw the error to ensure the flow fails and reports it to the client.
@@ -124,15 +134,24 @@ export const sendFinalConfirmationFlow = ai.defineFlow(
 
     // 2. Generate and send email to the driver if one is assigned
     if (input.driver?.name && input.driver?.email) {
-        const driverEmailContent = await driverEmailPrompt(input);
+        const driverEmailResponse = await driverEmailPrompt(input);
+        const driverEmailBody = driverEmailResponse.text;
         try {
-            await resend.emails.send({
+            console.log(`Attempting to send driver confirmation to ${input.driver.email}`);
+            const { data, error } = await resend.emails.send({
                 from: 'UL Transport <onboarding@resend.dev>',
                 to: input.driver.email,
                 subject: 'New Trip Assigned',
-                text: driverEmailContent.text
+                text: driverEmailBody
             });
-            console.log(`Driver confirmation email sent to ${input.driver.email}`);
+
+            if (error) {
+              console.error("Resend API error (driver email):", error);
+              throw new Error(`Failed to send driver email: ${JSON.stringify(error)}`);
+            }
+
+            console.log("Resend API success response (driver email):", data);
+            console.log(`Driver confirmation email sent successfully to ${input.driver.email}`);
         } catch (error) {
             console.error(`Failed to send driver email to ${input.driver.email}`, error);
             // Re-throw the error to ensure the flow fails and reports it to the client.

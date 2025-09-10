@@ -46,16 +46,25 @@ export const sendBookingConfirmationFlow = ai.defineFlow(
   },
   async (input) => {
     
-    const emailBody = await emailPrompt(input);
+    const emailResponse = await emailPrompt(input);
+    const emailBody = emailResponse.text;
 
     try {
-        await resend.emails.send({
+        console.log(`Attempting to send booking confirmation to ${input.email}`);
+        const { data, error } = await resend.emails.send({
             from: 'UL Transport <onboarding@resend.dev>',
             to: input.email,
             subject: 'Booking Confirmation',
-            text: emailBody.text,
+            text: emailBody,
         });
-        console.log(`Booking confirmation email sent to ${input.email}`);
+
+        if (error) {
+          console.error("Resend API error:", error);
+          throw new Error(`Failed to send booking confirmation email: ${JSON.stringify(error)}`);
+        }
+
+        console.log("Resend API success response:", data);
+        console.log(`Booking confirmation email sent successfully to ${input.email}`);
     } catch (error) {
         console.error("Failed to send booking confirmation email:", error);
         // Re-throw the error to ensure the flow fails and reports it to the client.
