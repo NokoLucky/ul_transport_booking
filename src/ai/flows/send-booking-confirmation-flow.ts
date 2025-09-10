@@ -46,8 +46,10 @@ export const sendBookingConfirmationFlow = ai.defineFlow(
   },
   async (input) => {
     
+    console.log("Generating booking confirmation email content...");
     const emailResponse = await emailPrompt(input);
     const emailBody = emailResponse.text;
+    console.log("Email content generated:\n", emailBody);
 
     try {
         console.log(`Attempting to send booking confirmation to ${input.email}`);

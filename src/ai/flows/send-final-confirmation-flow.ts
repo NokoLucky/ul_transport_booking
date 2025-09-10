@@ -105,8 +105,10 @@ export const sendFinalConfirmationFlow = ai.defineFlow(
     
     // 1. Generate and send email to the client
     const clientPrompt = input.driver?.name ? clientEmailWithDriverPrompt : clientEmailNoDriverPrompt;
+    console.log("Generating client email content...");
     const clientEmailResponse = await clientPrompt(input);
     const clientEmailBody = clientEmailResponse.text;
+    console.log("Client email content generated:\n", clientEmailBody);
 
     try {
         console.log(`Attempting to send client confirmation to ${input.clientEmail}`);
@@ -134,8 +136,10 @@ export const sendFinalConfirmationFlow = ai.defineFlow(
 
     // 2. Generate and send email to the driver if one is assigned
     if (input.driver?.name && input.driver?.email) {
+        console.log("Generating driver email content...");
         const driverEmailResponse = await driverEmailPrompt(input);
         const driverEmailBody = driverEmailResponse.text;
+        console.log("Driver email content generated:\n", driverEmailBody);
         try {
             console.log(`Attempting to send driver confirmation to ${input.driver.email}`);
             const { data, error } = await resend.emails.send({
@@ -160,9 +164,11 @@ export const sendFinalConfirmationFlow = ai.defineFlow(
     }
     
     // 3. Update statuses in the database
+    console.log("Updating database statuses...");
     const vehicleRegistration = input.vehicleDetails.split(' - ')[1];
     await updateBookingStatus(String(input.bookingId), 'Approved');
     await updateVehicleStatus(vehicleRegistration, 'Completed'); // This seems counterintuitive, but matching PHP logic. Might need review.
+    console.log("Database statuses updated successfully.");
     
     return { success: true };
   }
