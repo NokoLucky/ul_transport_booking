@@ -31,16 +31,7 @@ export const sendBookingConfirmationFlow = ai.defineFlow(
   async (input) => {
     
     console.log("Generating booking confirmation email content...");
-    const emailBody = `Hi ${input.name},
-
-This email serves as a notice that you have successfully requested a booking for a vehicle. Please be patient while we are processing your booking.
-
-Below is your reference code which can be used to check status on our system.
-      
-**${input.reference}**
-
-Kind Regards,
-UL Transport Management`;
+    const emailBody = `Hi ${input.name},<br/><br/>This email serves as a notice that you have successfully requested a booking for a vehicle. Please be patient while we are processing your booking.<br/><br/>Below is your reference code which can be used to check status on our system.<br/><br/><strong>${input.reference}</strong><br/><br/>Kind Regards,<br/>UL Transport Management`;
     console.log("Email content generated:\n", emailBody);
 
     try {
@@ -50,7 +41,7 @@ UL Transport Management`;
             from: 'UL Transport <onboarding@resend.dev>',
             to: testEmailRecipient, // ALWAYS SEND TO YOUR VERIFIED EMAIL FOR TESTING
             subject: 'Booking Confirmation',
-            text: emailBody,
+            html: emailBody,
         });
 
         if (error) {

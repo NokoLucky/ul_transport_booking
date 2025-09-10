@@ -49,40 +49,11 @@ export const sendFinalConfirmationFlow = ai.defineFlow(
 
     if (input.driver?.name) {
         // With Driver
-        clientEmailBody = `Hi ${input.clientName},
-
-We are excited to inform you that your booking has been approved.
-      
-Your allocated vehicle details are as follows: **${input.vehicleDetails}**
-      
-Your assigned driver details are as follows:
-Name: **${input.driver.name}**
-Contact: **${input.driver.mobile}**
-
-Please meet your designated driver at the student centre 30 minutes prior to departure time, which is at: **${input.departDateTime}**.
-      
-NB: Driver waiting period is 15 minutes maximum. If you are not at the meeting point by that period, the trip may be cancelled.
-
-Kind Regards,
-UL Transport Management`;
+        clientEmailBody = `Hi ${input.clientName},<br/><br/>We are excited to inform you that your booking has been approved.<br/><br/>Your allocated vehicle details are as follows: <strong>${input.vehicleDetails}</strong><br/><br/>Your assigned driver details are as follows:<br/>Name: <strong>${input.driver.name}</strong><br/>Contact: <strong>${input.driver.mobile}</strong><br/><br/>Please meet your designated driver at the student centre 30 minutes prior to departure time, which is at: <strong>${input.departDateTime}</strong>.<br/><br/>NB: Driver waiting period is 15 minutes maximum. If you are not at the meeting point by that period, the trip may be cancelled.<br/><br/>Kind Regards,<br/>UL Transport Management`;
 
     } else {
         // No Driver
-        clientEmailBody = `Hi ${input.clientName},
-
-We are excited to inform you that your booking has been approved. Below are the vehicle details.
-      
-Vehicle: **${input.vehicleDetails}**
-
-Please come and collect the vehicle at the transport section 30 minutes prior to your departure time, which is at **${input.departDateTime}**.
-      
-NB: Collection of vehicles on weekdays will be between 7:30 and 16:00, and on weekends between 8:00 and 12:00.
-      
-Please make sure to log a vehicle return on this link upon your return date, which is at: **${input.returnDateTime}**.
-(Note: Link functionality to be implemented in a future step for allocate_id: ${input.allocationId})
-
-Kind Regards,
-UL Transport Management`;
+        clientEmailBody = `Hi ${input.clientName},<br/><br/>We are excited to inform you that your booking has been approved. Below are the vehicle details.<br/><br/>Vehicle: <strong>${input.vehicleDetails}</strong><br/><br/>Please come and collect the vehicle at the transport section 30 minutes prior to your departure time, which is at <strong>${input.departDateTime}</strong>.<br/><br/>NB: Collection of vehicles on weekdays will be between 7:30 and 16:00, and on weekends between 8:00 and 12:00.<br/><br/>Please make sure to log a vehicle return on this link upon your return date, which is at: <strong>${input.returnDateTime}</strong>.<br/>(Note: Link functionality to be implemented in a future step for allocate_id: ${input.allocationId})<br/><br/>Kind Regards,<br/>UL Transport Management`;
     }
 
     console.log("Client email content generated:\n", clientEmailBody);
@@ -93,7 +64,7 @@ UL Transport Management`;
             from: 'UL Transport <onboarding@resend.dev>',
             to: testEmailRecipient, // ALWAYS SEND TO YOUR VERIFIED EMAIL FOR TESTING
             subject: 'Booking Approved',
-            text: clientEmailBody
+            html: clientEmailBody
         });
 
         if (error) {
@@ -114,19 +85,7 @@ UL Transport Management`;
     // 2. Generate and send email to the driver if one is assigned
     if (input.driver?.name && input.driver?.email) {
         console.log("Generating driver email content...");
-        const driverEmailBody = `Hi ${input.driver.name},
-
-You have been assigned a new trip.
-      
-Client: **${input.clientName}**
-Vehicle: **${input.vehicleDetails}**
-Departure: **${input.departDateTime}**
-Return: **${input.returnDateTime}**
-
-Please meet the client at the student centre 30 minutes prior to the departure time.
-
-Kind Regards,
-UL Transport Management`;
+        const driverEmailBody = `Hi ${input.driver.name},<br/><br/>You have been assigned a new trip.<br/><br/>Client: <strong>${input.clientName}</strong><br/>Vehicle: <strong>${input.vehicleDetails}</strong><br/>Departure: <strong>${input.departDateTime}</strong><br/>Return: <strong>${input.returnDateTime}</strong><br/><br/>Please meet the client at the student centre 30 minutes prior to the departure time.<br/><br/>Kind Regards,<br/>UL Transport Management`;
 
         console.log("Driver email content generated:\n", driverEmailBody);
         try {
@@ -135,7 +94,7 @@ UL Transport Management`;
                 from: 'UL Transport <onboarding@resend.dev>',
                 to: testEmailRecipient, // ALWAYS SEND TO YOUR VERIFIED EMAIL FOR TESTING
                 subject: 'New Trip Assigned',
-                text: driverEmailBody
+                html: driverEmailBody
             });
 
             if (error) {
