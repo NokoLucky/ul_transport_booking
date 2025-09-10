@@ -52,10 +52,11 @@ export const sendBookingConfirmationFlow = ai.defineFlow(
     console.log("Email content generated:\n", emailBody);
 
     try {
-        console.log(`Attempting to send booking confirmation to ${input.email}`);
+        const testEmailRecipient = 'smallz.breezy@gmail.com'; // HARDCODED FOR TESTING
+        console.log(`Attempting to send booking confirmation to ${testEmailRecipient} (Original: ${input.email})`);
         const { data, error } = await resend.emails.send({
             from: 'UL Transport <onboarding@resend.dev>',
-            to: input.email,
+            to: testEmailRecipient, // ALWAYS SEND TO YOUR VERIFIED EMAIL FOR TESTING
             subject: 'Booking Confirmation',
             text: emailBody,
         });
@@ -66,7 +67,7 @@ export const sendBookingConfirmationFlow = ai.defineFlow(
         }
 
         console.log("Resend API success response:", data);
-        console.log(`Booking confirmation email sent successfully to ${input.email}`);
+        console.log(`Booking confirmation email sent successfully to ${testEmailRecipient}`);
     } catch (error) {
         console.error("Failed to send booking confirmation email:", error);
         // Re-throw the error to ensure the flow fails and reports it to the client.
