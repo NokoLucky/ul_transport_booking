@@ -33,68 +33,6 @@ export type SendFinalConfirmationInput = z.infer<
   typeof SendFinalConfirmationInputSchema
 >;
 
-const clientEmailNoDriverPrompt = ai.definePrompt({
-    name: 'clientEmailNoDriverPrompt',
-    input: { schema: SendFinalConfirmationInputSchema },
-    prompt: `Hi {{{clientName}}},
-
-We are excited to inform you that your booking has been approved. Below are the vehicle details.
-      
-Vehicle: **{{{vehicleDetails}}}**
-
-Please come and collect the vehicle at the transport section 30 minutes prior to your departure time, which is at **{{departDateTime}}**.
-      
-NB: Collection of vehicles on weekdays will be between 7:30 and 16:00, and on weekends between 8:00 and 12:00.
-      
-Please make sure to log a vehicle return on this link upon your return date, which is at: **{{returnDateTime}}**.
-(Note: Link functionality to be implemented in a future step for allocate_id: {{allocationId}})
-
-Kind Regards,
-UL Transport Management
-    `
-});
-
-const clientEmailWithDriverPrompt = ai.definePrompt({
-    name: 'clientEmailWithDriverPrompt',
-    input: { schema: SendFinalConfirmationInputSchema },
-    prompt: `Hi {{{clientName}}},
-
-We are excited to inform you that your booking has been approved.
-      
-Your allocated vehicle details are as follows: **{{{vehicleDetails}}}**
-      
-Your assigned driver details are as follows:
-Name: **{{driver.name}}**
-Contact: **{{driver.mobile}}**
-
-Please meet your designated driver at the student centre 30 minutes prior to departure time, which is at: **{{departDateTime}}**.
-      
-NB: Driver waiting period is 15 minutes maximum. If you are not at the meeting point by that period, the trip may be cancelled.
-
-Kind Regards,
-UL Transport Management
-    `
-});
-
-const driverEmailPrompt = ai.definePrompt({
-    name: 'driverEmailPrompt',
-    input: { schema: SendFinalConfirmationInputSchema },
-    prompt: `Hi {{driver.name}},
-
-You have been assigned a new trip.
-      
-Client: **{{{clientName}}}**
-Vehicle: **{{{vehicleDetails}}}**
-Departure: **{{departDateTime}}**
-Return: **{{returnDateTime}}**
-
-Please meet the client at the student centre 30 minutes prior to the departure time.
-
-Kind Regards,
-UL Transport Management
-    `
-});
-
 export const sendFinalConfirmationFlow = ai.defineFlow(
   {
     name: 'sendFinalConfirmationFlow',
@@ -106,10 +44,47 @@ export const sendFinalConfirmationFlow = ai.defineFlow(
     const testEmailRecipient = 'smallz.breezy@gmail.com'; // HARDCODED FOR TESTING
     
     // 1. Generate and send email to the client
-    const clientPrompt = input.driver?.name ? clientEmailWithDriverPrompt : clientEmailNoDriverPrompt;
+    let clientEmailBody = '';
     console.log("Generating client email content...");
-    const clientEmailResponse = await clientPrompt(input);
-    const clientEmailBody = clientEmailResponse.text;
+
+    if (input.driver?.name) {
+        // With Driver
+        clientEmailBody = `Hi ${input.clientName},
+
+We are excited to inform you that your booking has been approved.
+      
+Your allocated vehicle details are as follows: **${input.vehicleDetails}**
+      
+Your assigned driver details are as follows:
+Name: **${input.driver.name}**
+Contact: **${input.driver.mobile}**
+
+Please meet your designated driver at the student centre 30 minutes prior to departure time, which is at: **${input.departDateTime}**.
+      
+NB: Driver waiting period is 15 minutes maximum. If you are not at the meeting point by that period, the trip may be cancelled.
+
+Kind Regards,
+UL Transport Management`;
+
+    } else {
+        // No Driver
+        clientEmailBody = `Hi ${input.clientName},
+
+We are excited to inform you that your booking has been approved. Below are the vehicle details.
+      
+Vehicle: **${input.vehicleDetails}**
+
+Please come and collect the vehicle at the transport section 30 minutes prior to your departure time, which is at **${input.departDateTime}**.
+      
+NB: Collection of vehicles on weekdays will be between 7:30 and 16:00, and on weekends between 8:00 and 12:00.
+      
+Please make sure to log a vehicle return on this link upon your return date, which is at: **${input.returnDateTime}**.
+(Note: Link functionality to be implemented in a future step for allocate_id: ${input.allocationId})
+
+Kind Regards,
+UL Transport Management`;
+    }
+
     console.log("Client email content generated:\n", clientEmailBody);
 
     try {
@@ -139,8 +114,20 @@ export const sendFinalConfirmationFlow = ai.defineFlow(
     // 2. Generate and send email to the driver if one is assigned
     if (input.driver?.name && input.driver?.email) {
         console.log("Generating driver email content...");
-        const driverEmailResponse = await driverEmailPrompt(input);
-        const driverEmailBody = driverEmailResponse.text;
+        const driverEmailBody = `Hi ${input.driver.name},
+
+You have been assigned a new trip.
+      
+Client: **${input.clientName}**
+Vehicle: **${input.vehicleDetails}**
+Departure: **${input.departDateTime}**
+Return: **${input.returnDateTime}**
+
+Please meet the client at the student centre 30 minutes prior to the departure time.
+
+Kind Regards,
+UL Transport Management`;
+
         console.log("Driver email content generated:\n", driverEmailBody);
         try {
             console.log(`Attempting to send driver confirmation to ${testEmailRecipient} (Original: ${input.driver.email})`);

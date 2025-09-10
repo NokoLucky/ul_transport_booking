@@ -22,22 +22,6 @@ export type SendBookingConfirmationInput = z.infer<
   typeof SendBookingConfirmationInputSchema
 >;
 
-const emailPrompt = ai.definePrompt({
-    name: 'bookingEmailPrompt',
-    input: { schema: SendBookingConfirmationInputSchema },
-    prompt: `Hi {{{name}}},
-
-This email serves as a notice that you have successfully requested a booking for a vehicle. Please be patient while we are processing your booking.
-
-Below is your reference code which can be used to check status on our system.
-      
-**{{reference}}**
-
-Kind Regards,
-UL Transport Management
-    `
-});
-
 export const sendBookingConfirmationFlow = ai.defineFlow(
   {
     name: 'sendBookingConfirmationFlow',
@@ -47,8 +31,16 @@ export const sendBookingConfirmationFlow = ai.defineFlow(
   async (input) => {
     
     console.log("Generating booking confirmation email content...");
-    const emailResponse = await emailPrompt(input);
-    const emailBody = emailResponse.text;
+    const emailBody = `Hi ${input.name},
+
+This email serves as a notice that you have successfully requested a booking for a vehicle. Please be patient while we are processing your booking.
+
+Below is your reference code which can be used to check status on our system.
+      
+**${input.reference}**
+
+Kind Regards,
+UL Transport Management`;
     console.log("Email content generated:\n", emailBody);
 
     try {
