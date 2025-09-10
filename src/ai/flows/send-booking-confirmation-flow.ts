@@ -58,9 +58,8 @@ export const sendBookingConfirmationFlow = ai.defineFlow(
         console.log(`Booking confirmation email sent to ${input.email}`);
     } catch (error) {
         console.error("Failed to send booking confirmation email:", error);
-        // We can decide if this should be a hard failure or not.
-        // For now, we'll let it fail silently in the background but log the error.
-        // In a production app, you'd want more robust error handling/retry logic.
+        // Re-throw the error to ensure the flow fails and reports it to the client.
+        throw new Error(`Failed to send booking confirmation email: ${error instanceof Error ? error.message : String(error)}`);
     }
     
     return { success: true };

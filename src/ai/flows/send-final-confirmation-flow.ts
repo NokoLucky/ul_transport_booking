@@ -117,7 +117,8 @@ export const sendFinalConfirmationFlow = ai.defineFlow(
         console.log(`Client confirmation email sent to ${input.clientEmail}`);
     } catch (error) {
         console.error(`Failed to send client email to ${input.clientEmail}`, error);
-        // Depending on requirements, we might want to stop the flow here
+        // Re-throw the error to ensure the flow fails and reports it to the client.
+        throw new Error(`Failed to send client email: ${error instanceof Error ? error.message : String(error)}`);
     }
 
 
@@ -134,6 +135,8 @@ export const sendFinalConfirmationFlow = ai.defineFlow(
             console.log(`Driver confirmation email sent to ${input.driver.email}`);
         } catch (error) {
             console.error(`Failed to send driver email to ${input.driver.email}`, error);
+            // Re-throw the error to ensure the flow fails and reports it to the client.
+            throw new Error(`Failed to send driver email: ${error instanceof Error ? error.message : String(error)}`);
         }
     }
     
