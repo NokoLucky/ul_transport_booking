@@ -23,7 +23,7 @@ import { inspectorLoginAction } from './_actions/inspectorLoginAction'
 export default function LoginPage() {
   const router = useRouter()
   const { toast } = useToast()
-  const [email, setEmail] = useState('')
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [loginRole, setLoginRole] = useState<'admin' | 'inspector' | null>(null)
@@ -34,9 +34,9 @@ export default function LoginPage() {
     try {
       let success = false;
       if (role === 'admin') {
-        success = await adminLoginAction(email, password)
+        success = await adminLoginAction(username, password)
       } else {
-        success = await inspectorLoginAction(email, password)
+        success = await inspectorLoginAction(username, password)
       }
 
       if (success) {
@@ -79,14 +79,14 @@ export default function LoginPage() {
         <CardContent>
           <div className="grid gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="email">Username</Label>
+              <Label htmlFor="username">Username</Label>
               <Input
-                id="email"
+                id="username"
                 type="text"
                 placeholder="staff.username"
                 required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 disabled={isLoading}
               />
             </div>
