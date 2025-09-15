@@ -264,7 +264,7 @@ export function CheckinForm({ allocation, logbook }: { allocation: any, logbook:
                                 </FormItem>
                                 <FormItem className="flex items-center space-x-2 space-y-0">
                                     <FormControl><RadioGroupItem value="Half" /></FormControl>
-                                    <FormLabel className="font-normal">H</F>
+                                    <FormLabel className="font-normal">H</FormLabel>
                                 </FormItem>
                                 <FormItem className="flex items-center space-x-2 space-y-0">
                                     <FormControl><RadioGroupItem value="Quater Full" /></FormControl>
