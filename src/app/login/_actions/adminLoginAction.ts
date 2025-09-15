@@ -13,15 +13,14 @@ async function adminLogin({ username, password_raw }: { username: string, passwo
     .eq('username', username)
     .single();
 
-  if (error) {
+  if (error && error.code !== 'PGRST116') { // PGRST116 means no rows found, which is not a db error.
     console.error('[Admin Login] Supabase error:', error.message);
-    // Don't throw the error to the client, just return false for security.
-    return false;
+    throw new Error(`Database error: ${error.message}`);
   }
 
   if (!data) {
     console.warn(`[Admin Login] No user found with username: ${username}`);
-    return false;
+    throw new Error(`No user found with username: ${username}`);
   }
 
   console.log(`[Admin Login] User found for ${username}. Comparing passwords...`);
@@ -29,11 +28,11 @@ async function adminLogin({ username, password_raw }: { username: string, passwo
   
   if (!isValid) {
       console.warn(`[Admin Login] Password comparison failed for user: ${username}`);
-  } else {
-      console.log(`[Admin Login] Password valid for user: ${username}. Login successful.`);
+      throw new Error('Invalid password.');
   }
 
-  return isValid;
+  console.log(`[Admin Login] Password valid for user: ${username}. Login successful.`);
+  return true;
 }
 
 

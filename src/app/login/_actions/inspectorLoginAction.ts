@@ -13,15 +13,14 @@ async function inspectorLogin({ username, password_raw }: { username: string, pa
     .eq('username', username)
     .single();
 
-  if (error) {
+  if (error && error.code !== 'PGRST116') { // PGRST116 means no rows found, which is not a db error.
     console.error('[Inspector Login] Supabase error:', error.message);
-    // Don't throw the error to the client, just return false for security.
-    return false;
+    throw new Error(`Database error: ${error.message}`);
   }
 
   if (!data) {
     console.warn(`[Inspector Login] No user found with username: ${username}`);
-    return false;
+    throw new Error(`No user found with username: ${username}`);
   }
 
   console.log(`[Inspector Login] User found for ${username}. Comparing passwords...`);
@@ -29,11 +28,11 @@ async function inspectorLogin({ username, password_raw }: { username: string, pa
 
   if (!isValid) {
       console.warn(`[Inspector Login] Password comparison failed for user: ${username}`);
-  } else {
-      console.log(`[Inspector Login] Password valid for user: ${username}. Login successful.`);
+      throw new Error('Invalid password.');
   }
   
-  return isValid;
+  console.log(`[Inspector Login] Password valid for user: ${username}. Login successful.`);
+  return true;
 }
 
 export async function inspectorLoginAction(username: string, password_raw: string): Promise<boolean> {
