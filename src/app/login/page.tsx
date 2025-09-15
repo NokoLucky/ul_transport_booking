@@ -49,10 +49,10 @@ export default function LoginPage() {
         throw new Error('Invalid username or password.')
       }
     } catch (error: any) {
-      console.error('Login failed:', error)
+      console.error('Login failed on client:', error)
       toast({
         title: 'Login Failed',
-        description: error.message || 'An unexpected error occurred.',
+        description: error.message || 'An unexpected error occurred. Check the console for details.',
         variant: 'destructive',
       })
     } finally {
