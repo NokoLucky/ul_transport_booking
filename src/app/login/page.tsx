@@ -16,7 +16,9 @@ import { Label } from '@/components/ui/label'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useToast } from '@/hooks/use-toast'
-import { adminLogin, inspectorLogin } from '@/lib/services/auth'
+import { adminLoginAction } from './_actions/adminLoginAction'
+import { inspectorLoginAction } from './_actions/inspectorLoginAction'
+
 
 export default function LoginPage() {
   const router = useRouter()
@@ -32,9 +34,9 @@ export default function LoginPage() {
     try {
       let success = false;
       if (role === 'admin') {
-        success = await adminLogin(email, password)
+        success = await adminLoginAction(email, password)
       } else {
-        success = await inspectorLogin(email, password)
+        success = await inspectorLoginAction(email, password)
       }
 
       if (success) {
