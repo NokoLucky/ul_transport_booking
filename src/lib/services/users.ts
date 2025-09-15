@@ -4,14 +4,14 @@
 import { supabase } from '@/lib/supabase/client';
 import bcrypt from 'bcryptjs';
 
-export async function createUser(details: {username: string, password_raw: string, role: 'admin' | 'inspector'}) {
-    const { username, password_raw, role } = details;
+export async function createUser(details: {username: string, password: string, role: 'admin' | 'inspector'}) {
+    const { username, password, role } = details;
 
-    if (!password_raw) {
+    if (!password) {
         throw new Error("Password cannot be empty.");
     }
 
-    const hashedPassword = await bcrypt.hash(password_raw, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
     
     const { data, error } = await supabase
         .from(role)
