@@ -41,7 +41,7 @@ export function EndTripForm({ allocation }: { allocation: any }) {
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     try {
-        const tripAlreadyEnded = await logExists(allocation.booking_id);
+        const tripAlreadyEnded = await logExists(allocation.booking.id);
         if (tripAlreadyEnded) {
             toast({
                 title: "Trip Already Ended",
@@ -54,8 +54,8 @@ export function EndTripForm({ allocation }: { allocation: any }) {
         const registration = allocation.vehicle.split(' - ')[1];
         if (!registration) throw new Error("Could not extract vehicle registration.");
 
-        await addLogbookKms(allocation.booking_id, data.kms, allocation.vehicle, new Date().toISOString());
-        await updateBookingStatus(String(allocation.booking_id), 'Completed');
+        await addLogbookKms(allocation.booking.id, data.kms, allocation.vehicle, new Date().toISOString());
+        await updateBookingStatus(String(allocation.booking.id), 'Completed');
         await updateVehicleStatus(registration, 'Unallocated');
 
         if(allocation.driver_id) {
