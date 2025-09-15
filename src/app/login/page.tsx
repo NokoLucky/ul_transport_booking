@@ -31,34 +31,34 @@ export default function LoginPage() {
   const handleLogin = async (role: 'admin' | 'inspector') => {
     setIsLoading(true)
     setLoginRole(role)
-    try {
-      let success = false;
-      if (role === 'admin') {
-        success = await adminLoginAction(email, password)
-      } else {
-        success = await inspectorLoginAction(email, password)
-      }
+    // try {
+    //   let success = false;
+    //   if (role === 'admin') {
+    //     success = await adminLoginAction(email, password)
+    //   } else {
+    //     success = await inspectorLoginAction(email, password)
+    //   }
 
-      if (success) {
-        toast({
-          title: 'Login Successful',
-          description: `Redirecting to ${role} dashboard...`,
-        })
-        router.push(`/dashboard/${role}`)
-      } else {
-        throw new Error('Invalid username or password.')
-      }
-    } catch (error: any) {
-      console.error('Login failed:', error)
-      toast({
-        title: 'Login Failed',
-        description: error.message || 'An unexpected error occurred.',
-        variant: 'destructive',
-      })
-    } finally {
-      setIsLoading(false)
-      setLoginRole(null)
-    }
+    //   if (success) {
+    //     toast({
+    //       title: 'Login Successful',
+    //       description: `Redirecting to ${role} dashboard...`,
+    //     })
+    //     router.push(`/dashboard/${role}`)
+    //   } else {
+    //     throw new Error('Invalid username or password.')
+    //   }
+    // } catch (error: any) {
+    //   console.error('Login failed:', error)
+    //   toast({
+    //     title: 'Login Failed',
+    //     description: error.message || 'An unexpected error occurred.',
+    //     variant: 'destructive',
+    //   })
+    // } finally {
+    //   setIsLoading(false)
+    //   setLoginRole(null)
+    // }
   }
 
   return (
