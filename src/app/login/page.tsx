@@ -1,7 +1,8 @@
 
 'use client'
 
-import { Bus } from 'lucide-react'
+import { useState } from 'react'
+import { Bus, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -14,9 +15,49 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { useToast } from '@/hooks/use-toast'
+import { adminLogin, inspectorLogin } from '@/lib/services/auth'
 
 export default function LoginPage() {
   const router = useRouter()
+  const { toast } = useToast()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const [loginRole, setLoginRole] = useState<'admin' | 'inspector' | null>(null)
+
+  const handleLogin = async (role: 'admin' | 'inspector') => {
+    setIsLoading(true)
+    setLoginRole(role)
+    try {
+      let success = false;
+      if (role === 'admin') {
+        success = await adminLogin(email, password)
+      } else {
+        success = await inspectorLogin(email, password)
+      }
+
+      if (success) {
+        toast({
+          title: 'Login Successful',
+          description: `Redirecting to ${role} dashboard...`,
+        })
+        router.push(`/dashboard/${role}`)
+      } else {
+        throw new Error('Invalid username or password.')
+      }
+    } catch (error: any) {
+      console.error('Login failed:', error)
+      toast({
+        title: 'Login Failed',
+        description: error.message || 'An unexpected error occurred.',
+        variant: 'destructive',
+      })
+    } finally {
+      setIsLoading(false)
+      setLoginRole(null)
+    }
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-muted/40">
@@ -36,12 +77,15 @@ export default function LoginPage() {
         <CardContent>
           <div className="grid gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">Username</Label>
               <Input
                 id="email"
-                type="email"
-                placeholder="staff@ul.ac.za"
+                type="text"
+                placeholder="staff.username"
                 required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={isLoading}
               />
             </div>
             <div className="grid gap-2">
@@ -54,14 +98,21 @@ export default function LoginPage() {
                   Forgot your password?
                 </Link>
               </div>
-              <Input id="password" type="password" required />
+              <Input 
+                id="password" 
+                type="password" 
+                required 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={isLoading}
+              />
             </div>
             <div className="grid grid-cols-2 gap-4">
-                <Button onClick={() => router.push('/dashboard/admin')} className="w-full">
-                    Login as Admin
+                <Button onClick={() => handleLogin('admin')} className="w-full" disabled={isLoading}>
+                    {isLoading && loginRole === 'admin' ? <Loader2 className="animate-spin" /> : 'Login as Admin'}
                 </Button>
-                <Button onClick={() => router.push('/dashboard/inspector')} className="w-full">
-                    Login as Inspector
+                <Button onClick={() => handleLogin('inspector')} className="w-full" disabled={isLoading}>
+                    {isLoading && loginRole === 'inspector' ? <Loader2 className="animate-spin" /> : 'Login as Inspector'}
                 </Button>
             </div>
           </div>
