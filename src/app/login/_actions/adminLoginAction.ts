@@ -4,7 +4,7 @@
 import { createServerClient } from '@/lib/supabase/server'
 import bcrypt from 'bcryptjs'
 
-async function adminLogin(username: string, password_raw: string): Promise<boolean> {
+async function adminLogin({ username, password_raw }: { username: string, password_raw: string }): Promise<boolean> {
   const supabase = createServerClient();
   const { data, error } = await supabase
     .from('admin')
@@ -23,5 +23,5 @@ async function adminLogin(username: string, password_raw: string): Promise<boole
 
 
 export async function adminLoginAction(username: string, password_raw: string): Promise<boolean> {
-  return await adminLogin(username, password_raw);
+  return await adminLogin({username, password_raw});
 }
