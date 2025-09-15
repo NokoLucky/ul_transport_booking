@@ -170,7 +170,9 @@ export default function InspectorDashboard() {
                                                 <TableCell>{comp.kms} km</TableCell>
                                                 <TableCell>{comp.drivers?.name || 'Not Required'}</TableCell>
                                                 <TableCell>
-                                                    <Button size="sm">Check In</Button>
+                                                    <Button size="sm" asChild>
+                                                        <Link href={`/dashboard/inspector/checkin/${comp.id}`}>Check In</Link>
+                                                    </Button>
                                                 </TableCell>
                                             </TableRow>
                                             )

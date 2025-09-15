@@ -1,3 +1,4 @@
+
 import { supabase } from '@/lib/supabase/client';
 
 export async function allocateVehicle(details: any) {
@@ -18,4 +19,14 @@ export async function updateDriverStatus(driverId, status) {
         .eq('id', driverId);
     
     if (error) throw error;
+}
+
+export async function checkinVehicle(details: any) {
+    const { data, error } = await supabase
+        .from('allocates')
+        .insert([details])
+        .select('booking_id');
+
+    if (error) throw error;
+    return data?.[0]?.booking_id;
 }
