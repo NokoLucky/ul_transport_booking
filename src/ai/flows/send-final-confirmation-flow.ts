@@ -42,6 +42,7 @@ export const sendFinalConfirmationFlow = ai.defineFlow(
   async (input) => {
 
     const testEmailRecipient = 'smallz.breezy@gmail.com'; // HARDCODED FOR TESTING
+    const completeTripUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:9002'}/complete-trip/${input.allocationId}`;
     
     // 1. Generate and send email to the client
     let clientEmailBody = '';
@@ -53,7 +54,6 @@ export const sendFinalConfirmationFlow = ai.defineFlow(
 
     } else {
         // No Driver
-        const completeTripUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:9002'}/complete-trip/${input.allocationId}`;
         clientEmailBody = `Hi ${input.clientName},<br/><br/>We are excited to inform you that your booking has been approved. Below are the vehicle details.<br/><br/>Vehicle: <strong>${input.vehicleDetails}</strong><br/><br/>Please come and collect the vehicle at the transport section 30 minutes prior to your departure time, which is at <strong>${input.departDateTime}</strong>.<br/><br/>NB: Collection of vehicles on weekdays will be between 7:30 and 16:00, and on weekends between 8:00 and 12:00.<br/><br/>Please make sure to log a vehicle return on this <a href="${completeTripUrl}">Link</a> upon your return date, which is at: <strong>${input.returnDateTime}</strong>.<br/><br/>Kind Regards,<br/>UL Transport Management`;
     }
 
@@ -86,7 +86,7 @@ export const sendFinalConfirmationFlow = ai.defineFlow(
     // 2. Generate and send email to the driver if one is assigned
     if (input.driver?.name && input.driver?.email) {
         console.log("Generating driver email content...");
-        const driverEmailBody = `Hi ${input.driver.name},<br/><br/>You have been assigned a new trip.<br/><br/>Client: <strong>${input.clientName}</strong><br/>Vehicle: <strong>${input.vehicleDetails}</strong><br/>Departure: <strong>${input.departDateTime}</strong><br/>Return: <strong>${input.returnDateTime}</strong><br/><br/>Please meet the client at the student centre 30 minutes prior to the departure time.<br/><br/>Kind Regards,<br/>UL Transport Management`;
+        const driverEmailBody = `Hi ${input.driver.name},<br/><br/>You have been assigned a new trip.<br/><br/>Client: <strong>${input.clientName}</strong><br/>Vehicle: <strong>${input.vehicleDetails}</strong><br/>Departure: <strong>${input.departDateTime}</strong><br/>Return: <strong>${input.returnDateTime}</strong><br/><br/>Please meet the client at the student centre 30 minutes prior to the departure time.<br/><br/>Please make sure to log the vehicle return on this <a href="${completeTripUrl}">Link</a> upon the return date at <strong>${input.returnDateTime}</strong>.<br/><br/>Kind Regards,<br/>UL Transport Management`;
 
         console.log("Driver email content generated:\n", driverEmailBody);
         try {
@@ -116,7 +116,7 @@ export const sendFinalConfirmationFlow = ai.defineFlow(
     console.log("Updating database statuses...");
     const vehicleRegistration = input.vehicleDetails.split(' - ')[1];
     await updateBookingStatus(String(input.bookingId), 'Approved');
-    await updateVehicleStatus(vehicleRegistration, 'Completed'); // This seems counterintuitive, but matching PHP logic. Might need review.
+    await updateVehicleStatus(vehicleRegistration, 'Allocated'); 
     console.log("Database statuses updated successfully.");
     
     return { success: true };
