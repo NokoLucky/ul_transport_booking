@@ -1,5 +1,6 @@
 
 import { createClient } from '@supabase/supabase-js'
+require('dotenv').config({ path: './.env.local' });
 
 // IMPORTANT: These should be stored in .env file and MUST NOT be public
 
