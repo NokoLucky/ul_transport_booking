@@ -53,7 +53,8 @@ export const sendFinalConfirmationFlow = ai.defineFlow(
 
     } else {
         // No Driver
-        clientEmailBody = `Hi ${input.clientName},<br/><br/>We are excited to inform you that your booking has been approved. Below are the vehicle details.<br/><br/>Vehicle: <strong>${input.vehicleDetails}</strong><br/><br/>Please come and collect the vehicle at the transport section 30 minutes prior to your departure time, which is at <strong>${input.departDateTime}</strong>.<br/><br/>NB: Collection of vehicles on weekdays will be between 7:30 and 16:00, and on weekends between 8:00 and 12:00.<br/><br/>Please make sure to log a vehicle return on this link upon your return date, which is at: <strong>${input.returnDateTime}</strong>.<br/>(Note: Link functionality to be implemented in a future step for allocate_id: ${input.allocationId})<br/><br/>Kind Regards,<br/>UL Transport Management`;
+        const completeTripUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:9002'}/complete-trip/${input.allocationId}`;
+        clientEmailBody = `Hi ${input.clientName},<br/><br/>We are excited to inform you that your booking has been approved. Below are the vehicle details.<br/><br/>Vehicle: <strong>${input.vehicleDetails}</strong><br/><br/>Please come and collect the vehicle at the transport section 30 minutes prior to your departure time, which is at <strong>${input.departDateTime}</strong>.<br/><br/>NB: Collection of vehicles on weekdays will be between 7:30 and 16:00, and on weekends between 8:00 and 12:00.<br/><br/>Please make sure to log a vehicle return on this <a href="${completeTripUrl}">Link</a> upon your return date, which is at: <strong>${input.returnDateTime}</strong>.<br/><br/>Kind Regards,<br/>UL Transport Management`;
     }
 
     console.log("Client email content generated:\n", clientEmailBody);
