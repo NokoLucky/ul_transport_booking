@@ -179,44 +179,46 @@ export function CheckinForm({ allocation, logbook }: { allocation: any, logbook:
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <fieldset className="border p-4 rounded-lg">
             <legend className="text-lg font-semibold px-2">Vehicle Return Details</legend>
-             <div className="grid md:grid-cols-2 gap-6 p-2">
-                <FormField
-                    control={form.control}
-                    name="kms"
-                    render={({ field }) => (
-                        <FormItem>
-                        <FormLabel>Closing KMS</FormLabel>
-                        <FormControl><Input type="number" {...field} readOnly className="bg-muted" /></FormControl>
-                        <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                 <FormField
-                    control={form.control}
-                    name="disk_expiry"
-                    render={({ field }) => (
-                        <FormItem className="flex flex-col">
-                        <FormLabel>License Disk Expiry Date *</FormLabel>
-                        <Popover>
-                            <PopoverTrigger asChild>
-                            <FormControl>
-                                <Button
-                                variant={"outline"}
-                                className={cn("w-full justify-start text-left font-normal", !field.value && "text-muted-foreground")}
-                                >
-                                <CalendarIcon className="mr-2 h-4 w-4" />
-                                {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
-                                </Button>
-                            </FormControl>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0">
-                                <Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus />
-                            </PopoverContent>
-                        </Popover>
-                        <FormMessage />
-                        </FormItem>
-                    )}
-                />
+             <div className="p-2 space-y-6">
+                <div className="grid md:grid-cols-2 gap-6">
+                    <FormField
+                        control={form.control}
+                        name="kms"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormLabel>Closing KMS</FormLabel>
+                            <FormControl><Input type="number" {...field} readOnly className="bg-muted" /></FormControl>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="disk_expiry"
+                        render={({ field }) => (
+                            <FormItem className="flex flex-col">
+                            <FormLabel>License Disk Expiry Date *</FormLabel>
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                <FormControl>
+                                    <Button
+                                    variant={"outline"}
+                                    className={cn("w-full justify-start text-left font-normal", !field.value && "text-muted-foreground")}
+                                    >
+                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                    {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
+                                    </Button>
+                                </FormControl>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0">
+                                    <Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus />
+                                </PopoverContent>
+                            </Popover>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                </div>
                  <FormField
                     control={form.control}
                     name="car_condition"
