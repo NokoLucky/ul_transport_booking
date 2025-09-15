@@ -1,10 +1,11 @@
 
 'use server'
 
-import { supabase } from '@/lib/supabase/client'
+import { createServerClient } from '@/lib/supabase/server'
 import bcrypt from 'bcryptjs'
 
 async function adminLogin(username: string, password_raw: string): Promise<boolean> {
+  const supabase = createServerClient();
   const { data, error } = await supabase
     .from('admin')
     .select('id, password')

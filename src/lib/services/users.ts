@@ -1,11 +1,12 @@
 
 'use server';
 
-import { supabase } from '@/lib/supabase/client';
+import { createServerClient } from '@/lib/supabase/server';
 import bcrypt from 'bcryptjs';
 
 export async function createUser(details: {username: string, password: string, role: 'admin' | 'inspector'}) {
     const { username, password, role } = details;
+    const supabase = createServerClient();
 
     if (!password) {
         throw new Error("Password cannot be empty.");
