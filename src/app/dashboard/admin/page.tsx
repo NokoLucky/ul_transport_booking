@@ -37,11 +37,13 @@ export default function AdminDashboard() {
     async function fetchData() {
       try {
         setLoading(true);
+        console.log("Fetching dashboard data...");
         const [newBookingsData, completedBookingsData] = await Promise.all([
           getBookings(),
           getCompletedBookings()
         ]);
         
+        console.log("Fetched new bookings data:", newBookingsData);
         setNewBookings(newBookingsData || []);
         
         console.log("Fetched completed bookings data:", completedBookingsData);
@@ -184,8 +186,9 @@ export default function AdminDashboard() {
                         </TableHeader>
                         <TableBody>
                         {newBookings.length > 0 ? newBookings.map((booking) => {
-                            const hasUploads = booking.uploads && booking.uploads.length > 0;
-                            const uploadData = hasUploads ? booking.uploads[0] : null;
+                            console.log(`Processing booking ID ${booking.id}:`, booking);
+                            console.log(`Uploads property for booking ID ${booking.id}:`, booking.uploads);
+                            const hasFiles = booking.uploads && (booking.uploads.leave_form || booking.uploads.passengers || booking.uploads.drivers);
 
                             return (
                                 <TableRow key={booking.id}>
@@ -202,20 +205,20 @@ export default function AdminDashboard() {
                                     <TableCell>{!booking.driver_name ? 'Required' : 'Provided'}</TableCell>
                                     <TableCell>
                                         <div className="flex flex-col gap-1">
-                                            {hasUploads ? (
+                                            {hasFiles ? (
                                                 <>
-                                                    {uploadData.leave_form ? (
-                                                        <a href={uploadData.leave_form} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline text-xs">Leave Form</a>
+                                                    {booking.uploads.leave_form ? (
+                                                        <a href={booking.uploads.leave_form} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline text-xs">Leave Form</a>
                                                     ) : (
                                                         <span className="text-xs text-muted-foreground">No Leave Form</span>
                                                     )}
-                                                    {uploadData.passengers ? (
-                                                        <a href={uploadData.passengers} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline text-xs">Passengers List</a>
+                                                    {booking.uploads.passengers ? (
+                                                        <a href={booking.uploads.passengers} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline text-xs">Passengers List</a>
                                                     ) : (
                                                         <span className="text-xs text-muted-foreground">No Passengers List</span>
                                                     )}
-                                                    {uploadData.drivers ? (
-                                                        <a href={uploadData.drivers} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline text-xs">Driver's License</a>
+                                                    {booking.uploads.drivers ? (
+                                                        <a href={booking.uploads.drivers} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline text-xs">Driver's License</a>
                                                     ) : (
                                                         <span className="text-xs text-muted-foreground">No Driver's License</span>
                                                     )}

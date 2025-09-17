@@ -40,19 +40,21 @@ export async function getBookings() {
   // Step 2: For each booking, fetch its corresponding upload data
   const bookingsWithUploads = await Promise.all(
     bookings.map(async (booking) => {
-      const { data: uploads, error: uploadsError } = await supabase
+      // Fetch a SINGLE upload record for the booking
+      const { data: upload, error: uploadError } = await supabase
         .from('uploads')
         .select('*')
-        .eq('booking_id', booking.id);
-      
-      if (uploadsError) {
-        console.error(`Error fetching uploads for booking ${booking.id}:`, uploadsError);
-        // Return the booking without uploads if the query fails
-        return { ...booking, uploads: [] };
+        .eq('booking_id', booking.id)
+        .single(); // Use .single() to get an object or null
+
+      if (uploadError && uploadError.code !== 'PGRST116') { // PGRST116 means no rows found, which is okay.
+        console.error(`Error fetching uploads for booking ${booking.id}:`, uploadError);
+        // Return booking without uploads if there's a critical error
+        return { ...booking, uploads: null };
       }
       
       // Step 3: Combine the data
-      return { ...booking, uploads: uploads || [] };
+      return { ...booking, uploads: upload }; // 'uploads' is now an object or null
     })
   );
 
