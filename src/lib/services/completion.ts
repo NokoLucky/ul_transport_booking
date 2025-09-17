@@ -7,12 +7,16 @@ export async function getCompletedBookings() {
         .from('allocates')
         .select(`
             *,
-            booking (*),
-            drivers (*)
+            booking:booking (*, uploads:uploads(*)),
+            drivers:drivers (*)
         `)
+        .eq('action', 'Check Out')
         .eq('booking.status', 'Awaiting Admin Approval');
     
-    if (error) throw error;
+    if (error) {
+        console.error("Error in getCompletedBookings:", error);
+        throw error;
+    }
     return data;
 }
 
@@ -21,13 +25,16 @@ export async function getOneCompletedBooking(allocateId) {
         .from('allocates')
         .select(`
             *,
-            booking (*),
-            drivers (*)
+            booking:booking(*),
+            drivers:drivers(*)
         `)
         .eq('id', allocateId)
         .single();
 
-    if (error) throw error;
+    if (error) {
+        console.error("Error in getOneCompletedBooking:", error);
+        throw error;
+    }
     return data;
 }
 
@@ -36,12 +43,16 @@ export async function getCompletedBookingsCheckin() {
         .from('allocates')
         .select(`
             *,
-            booking (*),
-            drivers (*)
+            booking:booking(*),
+            drivers:drivers(*)
         `)
+        .eq('action', 'Check Out')
         .eq('booking.status', 'Completed');
 
-    if (error) throw error;
+    if (error) {
+        console.error("Error in getCompletedBookingsCheckin:", error);
+        throw error;
+    }
     return data;
 }
 

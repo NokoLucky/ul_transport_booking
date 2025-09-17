@@ -41,10 +41,13 @@ export default function AdminDashboard() {
           getBookings(),
           getCompletedBookings()
         ]);
-        const bookings = newBookingsData || [];
-        setNewBookings(bookings);
-        console.log("Fetched new bookings data:", bookings); // LOG 1: Log all fetched data
+        
+        console.log("Fetched new bookings data:", newBookingsData); // LOG 1
+        setNewBookings(newBookingsData || []);
+        
+        console.log("Fetched completed bookings data:", completedBookingsData);
         setCompletedBookings(completedBookingsData || []);
+        
         setError(null);
       } catch (err: any) {
         const errorMessage = err.message || JSON.stringify(err);
@@ -182,9 +185,8 @@ export default function AdminDashboard() {
                         </TableHeader>
                         <TableBody>
                         {newBookings.length > 0 ? newBookings.map((booking) => {
-                            // LOG 2: Log each booking object inside the map
-                            console.log(`Processing booking ID ${booking.id}:`, booking);
-                            console.log(`Uploads property for booking ID ${booking.id}:`, booking.uploads);
+                            console.log(`Processing booking ID ${booking.id}:`, booking); // LOG 2
+                            console.log(`Uploads property for booking ID ${booking.id}:`, booking.uploads); // LOG 3
 
                             const hasUploads = booking.uploads && booking.uploads.length > 0;
                             const uploadData = hasUploads ? booking.uploads[0] : null;
@@ -204,7 +206,7 @@ export default function AdminDashboard() {
                                     <TableCell>{!booking.driver_name ? 'Required' : 'Provided'}</TableCell>
                                     <TableCell>
                                         <div className="flex flex-col gap-1">
-                                            {hasUploads && uploadData ? (
+                                            {uploadData ? (
                                                 <>
                                                     {uploadData.leave_form ? (
                                                         <a href={uploadData.leave_form} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline text-xs">Leave Form</a>
@@ -308,5 +310,3 @@ export default function AdminDashboard() {
     </div>
   )
 }
-
-  

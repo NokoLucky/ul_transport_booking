@@ -28,11 +28,14 @@ export async function getBookings() {
     .from('booking')
     .select(`
       *,
-      uploads (*)
+      uploads:uploads (*)
     `)
     .eq('status', 'In Progress');
 
-  if (error) throw error;
+  if (error) {
+    console.error("Error fetching bookings with uploads:", error);
+    throw error;
+  }
   return data;
 }
 
