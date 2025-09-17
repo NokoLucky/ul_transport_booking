@@ -1,4 +1,6 @@
-import { supabase } from '@/lib/supabase/client';
+import { getSupabaseClient } from '@/lib/supabase/client';
+
+const supabase = getSupabaseClient();
 
 export async function addLogbookKms(bookingId, kms, vehicle, logDate) {
     const { error } = await supabase

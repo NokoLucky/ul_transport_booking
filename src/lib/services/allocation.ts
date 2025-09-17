@@ -1,5 +1,7 @@
 
-import { supabase } from '@/lib/supabase/client';
+import { getSupabaseClient } from '@/lib/supabase/client';
+
+const supabase = getSupabaseClient();
 
 export async function allocateVehicle(details: any) {
     const { data, error } = await supabase

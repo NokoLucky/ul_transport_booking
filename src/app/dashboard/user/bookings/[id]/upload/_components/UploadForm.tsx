@@ -11,9 +11,11 @@ import { Label } from '@/components/ui/label'
 import { FileUp, FileCheck2, FileText } from 'lucide-react'
 import { sendBookingConfirmation } from '@/ai/flows/send-booking-confirmation-flow'
 import { addBookingFiles } from '@/lib/services/uploads'
-import { supabase } from '@/lib/supabase/client'
+import { getSupabaseClient } from '@/lib/supabase/client'
 import { getOneBooking } from '@/lib/services/bookings'
 import { Separator } from '@/components/ui/separator'
+
+const supabase = getSupabaseClient();
 
 type FileUploadRowProps = {
     title: string;

@@ -8,10 +8,12 @@ import { useToast } from '@/hooks/use-toast'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { supabase } from '@/lib/supabase/client'
+import { getSupabaseClient } from '@/lib/supabase/client'
 import { addInspectorFiles } from '@/lib/services/uploads'
 import { FileUp, ImagePlus, X } from 'lucide-react'
 import { updateBookingStatus } from '@/lib/services/bookings'
+
+const supabase = getSupabaseClient();
 
 type FilePreviewProps = {
     file: File | null;

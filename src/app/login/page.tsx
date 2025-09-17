@@ -46,10 +46,11 @@ export default function LoginPage() {
         })
         router.push(`/dashboard/${role}`)
       } else {
+        // This path should ideally not be reached if server actions throw errors
         throw new Error('Invalid username or password.')
       }
     } catch (error: any) {
-      console.error('Login failed on client:', error)
+      console.error('Login failed on client:', error.message)
       toast({
         title: 'Login Failed',
         description: error.message || 'An unexpected error occurred. Check the console for details.',

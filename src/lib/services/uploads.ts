@@ -1,5 +1,7 @@
 
-import { supabase } from '@/lib/supabase/client';
+import { getSupabaseClient } from '@/lib/supabase/client';
+
+const supabase = getSupabaseClient();
 
 export async function addBookingFiles(bookingId: string, leaveFormPath: string | null, passengersPath: string | null, driversLicensePath: string | null) {
     const { error } = await supabase
