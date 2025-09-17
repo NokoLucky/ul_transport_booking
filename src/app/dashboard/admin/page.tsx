@@ -25,19 +25,6 @@ import { useToast } from '@/hooks/use-toast';
 import { sendFinalConfirmation } from '@/ai/flows/send-final-confirmation-flow';
 import { Loader2 } from 'lucide-react';
 
-// A helper function to extract filename from a URL
-const getFileName = (url: string | null | undefined): string => {
-    if (!url) return '';
-    try {
-        const path = new URL(url).pathname;
-        const parts = path.split('/');
-        return decodeURIComponent(parts[parts.length - 1] || '');
-    } catch (e) {
-        console.error("Failed to parse URL for filename:", url, e);
-        return '';
-    }
-};
-
 export default function AdminDashboard() {
   const [newBookings, setNewBookings] = useState<any[]>([]);
   const [completedBookings, setCompletedBookings] = useState<any[]>([]);
@@ -207,10 +194,24 @@ export default function AdminDashboard() {
                                 <TableCell>{!booking.driver_name ? 'Required' : 'Provided'}</TableCell>
                                 <TableCell>
                                     <div className="flex flex-col gap-1">
-                                        {booking.uploads?.[0]?.leave_form ? <a href={booking.uploads[0].leave_form} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline text-xs">{getFileName(booking.uploads[0].leave_form) || 'Leave Form'}</a> : <span className="text-xs text-muted-foreground">No Leave Form</span>}
-                                        {booking.uploads?.[0]?.passengers ? <a href={booking.uploads[0].passengers} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline text-xs">{getFileName(booking.uploads[0].passengers) || 'Passengers List'}</a>: <span className="text-xs text-muted-foreground">No Passengers List</span>}
-                                        {booking.uploads?.[0]?.drivers ? <a href={booking.uploads[0].drivers} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline text-xs">{getFileName(booking.uploads[0].drivers) || 'Driver\'s License'}</a>: <span className="text-xs text-muted-foreground">No Driver's License</span>}
-                                        {(!booking.uploads || booking.uploads.length === 0) && <span className="text-xs text-muted-foreground">No files</span>}
+                                        {booking.uploads[0]?.leave_form ? (
+                                            <a href={booking.uploads[0].leave_form} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline text-xs">Leave Form</a>
+                                        ) : (
+                                            <span className="text-xs text-muted-foreground">No Leave Form</span>
+                                        )}
+                                        {booking.uploads[0]?.passengers ? (
+                                            <a href={booking.uploads[0].passengers} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline text-xs">Passengers List</a>
+                                        ) : (
+                                            <span className="text-xs text-muted-foreground">No Passengers List</span>
+                                        )}
+                                        {booking.uploads[0]?.drivers ? (
+                                            <a href={booking.uploads[0].drivers} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline text-xs">Driver's License</a>
+                                        ) : (
+                                            <span className="text-xs text-muted-foreground">No Driver's License</span>
+                                        )}
+                                        {!booking.uploads[0]?.leave_form && !booking.uploads[0]?.passengers && !booking.uploads[0]?.drivers && (
+                                            <span className="text-xs text-muted-foreground">No files uploaded</span>
+                                        )}
                                     </div>
                                 </TableCell>
                                 <TableCell>
@@ -293,3 +294,5 @@ export default function AdminDashboard() {
     </div>
   )
 }
+
+    
