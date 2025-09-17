@@ -3,6 +3,17 @@
 
 import { useState } from 'react'
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
+import {
   Card,
   CardContent,
   CardDescription,
@@ -23,6 +34,8 @@ import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
 import { getStatus } from '@/lib/services/status'
+import { cancelBooking } from '@/lib/services/bookings'
+import { useToast } from '@/hooks/use-toast'
 import { Loader2 } from 'lucide-react'
 
 type BookingResult = {
@@ -44,6 +57,8 @@ export default function StatusPage() {
   const [result, setResult] = useState<BookingResult | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [isCanceling, setIsCanceling] = useState(false)
+  const { toast } = useToast()
 
   const handleCheck = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -71,15 +86,37 @@ export default function StatusPage() {
         setIsLoading(false)
     }
   }
+
+  const handleCancelBooking = async () => {
+    if (!result) return;
+    setIsCanceling(true);
+    try {
+        const updatedBooking = await cancelBooking(result.id);
+        setResult(updatedBooking as BookingResult);
+        toast({
+            title: "Booking Canceled",
+            description: "Your booking request has been successfully canceled.",
+        });
+    } catch (error: any) {
+        toast({
+            title: "Cancellation Failed",
+            description: error.message || "Could not cancel the booking. Please try again.",
+            variant: "destructive",
+        });
+    } finally {
+        setIsCanceling(false);
+    }
+  }
   
   const getBadgeVariant = (status: string): 'destructive' | 'secondary' | 'default' | 'outline' => {
     const lowerStatus = status.toLowerCase();
-    if (lowerStatus.includes('reject')) return 'destructive';
-    if (lowerStatus.includes('pending')) return 'secondary';
-    if (lowerStatus.includes('approve')) return 'default';
-    if (lowerStatus.includes('progress')) return 'default';
+    if (lowerStatus.includes('reject') || lowerStatus.includes('cancel')) return 'destructive';
+    if (lowerStatus.includes('pending') || lowerStatus.includes('allocating')) return 'secondary';
+    if (lowerStatus.includes('approve') || lowerStatus.includes('progress') || lowerStatus.includes('completed')) return 'default';
     return 'outline';
   }
+
+  const isCancelable = result && !['Canceled', 'Rejected', 'Completed', 'Approved', 'Archived'].includes(result.status);
 
 
   return (
@@ -137,9 +174,28 @@ export default function StatusPage() {
                         <Badge variant={getBadgeVariant(result.status)}>{result.status}</Badge>
                       </TableCell>
                       <TableCell>
-                        <Button variant="link" className="p-0 h-auto text-destructive" onClick={() => alert('Cancel booking functionality not yet implemented.')}>
-                          Cancel Booking
-                        </Button>
+                         {isCancelable && (
+                            <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <Button variant="link" className="p-0 h-auto text-destructive" disabled={isCanceling}>
+                                        {isCanceling && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                        Cancel Booking
+                                    </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        This action cannot be undone. This will permanently cancel your booking request.
+                                    </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                    <AlertDialogCancel>Back</AlertDialogCancel>
+                                    <AlertDialogAction onClick={handleCancelBooking}>Continue</AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
+                         )}
                       </TableCell>
                     </TableRow>
                   </TableBody>

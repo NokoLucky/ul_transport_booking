@@ -71,6 +71,22 @@ export async function updateBookingStatus(bookingId: string, status: string) {
     return data;
 }
 
+export async function cancelBooking(bookingId: string) {
+    const { data, error } = await supabase
+        .from('booking')
+        .update({ status: 'Canceled' })
+        .eq('id', bookingId)
+        .select()
+        .single();
+    
+    if (error) {
+        console.error('Error canceling booking:', error);
+        throw new Error('Failed to cancel booking.');
+    }
+    return data;
+}
+
+
 export async function deleteBooking(bookingId) {
     const { error } = await supabase
         .from('booking')
