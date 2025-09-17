@@ -28,7 +28,7 @@ export async function getBookings() {
     .from('booking')
     .select(`
       *,
-      uploads:uploads (*)
+      uploads (*)
     `)
     .eq('status', 'In Progress');
 
