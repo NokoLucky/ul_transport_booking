@@ -42,6 +42,7 @@ export default function AdminDashboard() {
           getCompletedBookings()
         ]);
         
+        console.log("Fetched new bookings data: ", newBookingsData);
         setNewBookings(newBookingsData || []);
         setCompletedBookings(completedBookingsData || []);
         
@@ -182,6 +183,9 @@ export default function AdminDashboard() {
                         </TableHeader>
                         <TableBody>
                         {newBookings.length > 0 ? newBookings.map((booking) => {
+                            console.log(`Processing booking ID ${booking.id}:`, booking);
+                            console.log(`Uploads property for booking ID ${booking.id}:`, booking.uploads);
+                            
                             const uploadData = booking.uploads;
                             const hasFiles = uploadData && (uploadData.leave_form || uploadData.passengers || uploadData.drivers);
 
@@ -304,5 +308,3 @@ export default function AdminDashboard() {
     </div>
   )
 }
-
-    
