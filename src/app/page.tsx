@@ -1,7 +1,7 @@
+
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Bus } from 'lucide-react'
 
 export default function HomePage() {
   return (
@@ -17,7 +17,7 @@ export default function HomePage() {
       <div className="absolute inset-0 bg-black/60" />
       <div className="relative z-10 flex h-screen flex-col items-center justify-center text-center text-white">
         <div className="flex items-center gap-4">
-          <Bus className="h-16 w-16 text-accent" />
+          <Image src="/logo.png" alt="University of Limpopo Logo" width={80} height={80} className="text-accent" />
           <h1 className="font-headline text-5xl font-bold tracking-tight md:text-7xl">
             University Of Limpopo Transport Booking System
           </h1>

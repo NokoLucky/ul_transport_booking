@@ -2,7 +2,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Bus, Loader2 } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -14,6 +14,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useToast } from '@/hooks/use-toast'
 import { adminLoginAction } from './_actions/adminLoginAction'
@@ -45,9 +46,6 @@ export default function LoginPage() {
           description: `Redirecting to ${role} dashboard...`,
         })
         router.push(`/dashboard/${role}`)
-      } else {
-        // This path should ideally not be reached if server actions throw errors
-        throw new Error('Invalid username or password.')
       }
     } catch (error: any) {
       console.error('Login failed on client:', error.message)
@@ -67,7 +65,7 @@ export default function LoginPage() {
       <Card className="mx-auto max-w-sm w-full">
         <CardHeader className="text-center">
             <div className="flex flex-col items-center gap-2 justify-center mb-4">
-                <Bus className="h-12 w-12 text-primary" />
+                <Image src="/logo.png" alt="University of Limpopo Logo" width={80} height={80} />
                 <h1 className="font-headline text-2xl font-bold">
                     University Of Limpopo Transport Booking System
                 </h1>
