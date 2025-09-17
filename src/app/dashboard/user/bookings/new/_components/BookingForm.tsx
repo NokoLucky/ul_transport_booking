@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { format } from "date-fns"
-import { CalendarIcon, Car, Users } from "lucide-react"
+import { CalendarIcon, Car, Loader2, Users } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
@@ -343,8 +343,11 @@ export function BookingForm() {
         </Accordion>
         
         <div className="flex justify-end pt-4 gap-4">
-            <Button type="button" variant="outline" onClick={() => router.back()}>Back</Button>
-            <Button type="submit">Submit & Continue to Uploads</Button>
+            <Button type="button" variant="outline" onClick={() => router.back()} disabled={form.formState.isSubmitting}>Back</Button>
+            <Button type="submit" disabled={form.formState.isSubmitting}>
+                {form.formState.isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {form.formState.isSubmitting ? 'Submitting...' : 'Submit & Continue to Uploads'}
+            </Button>
         </div>
       </form>
     </Form>

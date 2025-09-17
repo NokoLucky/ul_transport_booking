@@ -10,12 +10,14 @@ import { Button } from '@/components/ui/button'
 import { useToast } from '@/hooks/use-toast';
 import { getInspectorBookings, updateBookingStatus } from '@/lib/services/bookings';
 import { getCompletedBookingsCheckin } from '@/lib/services/completion';
+import { Loader2 } from 'lucide-react';
 
 export default function InspectorDashboard() {
     const [checkOutBookings, setCheckOutBookings] = useState<any[]>([]);
     const [checkInBookings, setCheckInBookings] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState<string | null>(null);
     const { toast } = useToast();
 
     useEffect(() => {
@@ -42,6 +44,7 @@ export default function InspectorDashboard() {
     
     const handleReject = async (bookingId: string) => {
         if (confirm('Are you sure you want to reject this application?')) {
+            setIsSubmitting(bookingId);
             try {
                 await updateBookingStatus(bookingId, 'Rejected');
                 setCheckOutBookings(prev => prev.filter(b => b.id !== bookingId));
@@ -57,6 +60,8 @@ export default function InspectorDashboard() {
                     description: 'Could not reject the booking. Please try again.',
                     variant: 'destructive'
                 });
+            } finally {
+                setIsSubmitting(null);
             }
         }
     };
@@ -120,7 +125,10 @@ export default function InspectorDashboard() {
                                                         <Button size="sm" asChild>
                                                             <Link href={`/dashboard/inspector/allocate/${booking.id}`}>Allocate</Link>
                                                         </Button>
-                                                        <Button size="sm" variant="destructive" onClick={() => handleReject(booking.id)}>Reject</Button>
+                                                        <Button size="sm" variant="destructive" onClick={() => handleReject(booking.id)} disabled={isSubmitting === booking.id}>
+                                                            {isSubmitting === booking.id && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                                            Reject
+                                                        </Button>
                                                     </div>
                                                 </TableCell>
                                             </TableRow>

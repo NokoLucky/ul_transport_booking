@@ -23,6 +23,7 @@ import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
 import { getStatus } from '@/lib/services/status'
+import { Loader2 } from 'lucide-react'
 
 type BookingResult = {
   id: string;
@@ -101,7 +102,10 @@ export default function StatusPage() {
                 disabled={isLoading}
               />
             </div>
-            <Button type="submit" disabled={isLoading}>{isLoading ? 'Searching...' : 'Check'}</Button>
+            <Button type="submit" disabled={isLoading}>
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {isLoading ? 'Searching...' : 'Check'}
+            </Button>
             <Button asChild variant="outline">
               <Link href="/">Back</Link>
             </Button>

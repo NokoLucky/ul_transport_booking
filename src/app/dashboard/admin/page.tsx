@@ -23,6 +23,7 @@ import { getBookings, updateBookingStatus } from '@/lib/services/bookings';
 import { getCompletedBookings } from '@/lib/services/completion';
 import { useToast } from '@/hooks/use-toast';
 import { sendFinalConfirmation } from '@/ai/flows/send-final-confirmation-flow';
+import { Loader2 } from 'lucide-react';
 
 // A helper function to extract filename from a URL
 const getFileName = (url: string | null | undefined): string => {
@@ -42,6 +43,7 @@ export default function AdminDashboard() {
   const [completedBookings, setCompletedBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState<string | null>(null); // Use booking ID to track submission
   const { toast } = useToast();
 
   useEffect(() => {
@@ -67,6 +69,7 @@ export default function AdminDashboard() {
   }, []);
 
   const handleCheckAvailability = async (bookingId: string) => {
+    setIsSubmitting(bookingId);
     try {
       await updateBookingStatus(bookingId, 'Allocating');
       setNewBookings((prev) => prev.filter((b) => b.id !== bookingId));
@@ -81,11 +84,14 @@ export default function AdminDashboard() {
         description: 'Could not send the request to the inspector. Please try again.',
         variant: 'destructive',
       });
+    } finally {
+        setIsSubmitting(null);
     }
   };
 
   const handleReject = async (bookingId: string) => {
      if (confirm('Are you sure you want to reject this application?')) {
+        setIsSubmitting(bookingId);
         try {
             await updateBookingStatus(bookingId, 'Rejected');
             setNewBookings((prev) => prev.filter((b) => b.id !== bookingId));
@@ -101,11 +107,14 @@ export default function AdminDashboard() {
                 description: 'Could not reject the booking. Please try again.',
                 variant: 'destructive'
             });
+        } finally {
+            setIsSubmitting(null);
         }
     }
   }
 
   const handleSendConfirmation = async (comp: any) => {
+    setIsSubmitting(comp.id);
     try {
       const confirmationInput = {
         clientName: comp.booking.user_name,
@@ -137,6 +146,8 @@ export default function AdminDashboard() {
         description: 'Could not send the confirmation. Please try again.',
         variant: 'destructive'
       });
+    } finally {
+        setIsSubmitting(null);
     }
   }
 
@@ -204,8 +215,14 @@ export default function AdminDashboard() {
                                 </TableCell>
                                 <TableCell>
                                     <div className="flex gap-2">
-                                        <Button size="sm" onClick={() => handleCheckAvailability(booking.id)}>Check Availability</Button>
-                                        <Button size="sm" variant="destructive" onClick={() => handleReject(booking.id)}>Reject</Button>
+                                        <Button size="sm" onClick={() => handleCheckAvailability(booking.id)} disabled={isSubmitting === booking.id}>
+                                            {isSubmitting === booking.id && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                            Check Availability
+                                        </Button>
+                                        <Button size="sm" variant="destructive" onClick={() => handleReject(booking.id)} disabled={isSubmitting === booking.id}>
+                                            {isSubmitting === booking.id && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                            Reject
+                                        </Button>
                                     </div>
                                 </TableCell>
                             </TableRow>
@@ -254,7 +271,10 @@ export default function AdminDashboard() {
                                </TableCell>
                                <TableCell>{comp.drivers?.name || 'Not Required'}</TableCell>
                                <TableCell>
-                                   <Button size="sm" onClick={() => handleSendConfirmation(comp)}>Send Confirmation</Button>
+                                   <Button size="sm" onClick={() => handleSendConfirmation(comp)} disabled={isSubmitting === comp.id}>
+                                     {isSubmitting === comp.id && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                     Send Confirmation
+                                   </Button>
                                </TableCell>
                            </TableRow>
                            )
