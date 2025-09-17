@@ -35,27 +35,37 @@ export async function getBookings() {
     throw bookingsError;
   }
 
-  if (!bookings) return [];
+  if (!bookings || bookings.length === 0) return [];
 
-  // Step 2: For each booking, fetch its corresponding upload data
-  const bookingsWithUploads = await Promise.all(
-    bookings.map(async (booking) => {
-      // Fetch upload records for the booking
-      const { data: upload, error: uploadError } = await supabase
-        .from('uploads')
-        .select('*')
-        .eq('booking_id', booking.id);
+  // Step 2: Get all booking IDs
+  const bookingIds = bookings.map(booking => booking.id);
 
-      if (uploadError && uploadError.code !== 'PGRST116') { // PGRST116 means no rows found, which is okay.
-        console.error(`Error fetching uploads for booking ${booking.id}:`, uploadError);
-        // Return booking without uploads if there's a critical error
-        return { ...booking, uploads: null };
-      }
-      
-      // Step 3: Combine the data. We take the first upload record if it exists.
-      return { ...booking, uploads: upload?.[0] || null }; 
-    })
-  );
+  // Step 3: Fetch all uploads for those booking IDs in a single query
+  const { data: uploads, error: uploadsError } = await supabase
+    .from('uploads')
+    .select('*')
+    .in('booking_id', bookingIds);
+
+  if (uploadsError) {
+    console.error("Error fetching uploads:", uploadsError);
+    throw uploadsError;
+  }
+
+  // Step 4: Create a map of uploads by booking_id for easy lookup
+  const uploadsMap = new Map();
+  if (uploads) {
+    for (const upload of uploads) {
+        uploadsMap.set(upload.booking_id, upload);
+    }
+  }
+
+  // Step 5: Combine the bookings with their corresponding uploads
+  const bookingsWithUploads = bookings.map(booking => {
+    return {
+      ...booking,
+      uploads: uploadsMap.get(booking.id) || null
+    };
+  });
 
   return bookingsWithUploads;
 }
@@ -119,3 +129,5 @@ export async function deleteBooking(bookingId) {
 
     if (error) throw error;
 }
+
+    
