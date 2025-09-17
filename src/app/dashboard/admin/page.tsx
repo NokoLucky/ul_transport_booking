@@ -42,7 +42,6 @@ export default function AdminDashboard() {
           getCompletedBookings()
         ]);
         
-        console.log("Fetched new bookings data:", newBookingsData); // LOG 1
         setNewBookings(newBookingsData || []);
         
         console.log("Fetched completed bookings data:", completedBookingsData);
@@ -180,15 +179,11 @@ export default function AdminDashboard() {
                             <TableHead>Vehicle</TableHead>
                             <TableHead>Driver</TableHead>
                             <TableHead>Files</TableHead>
-                            <TableHead>Upload Booking ID</TableHead> 
                             <TableHead>Actions</TableHead>
                         </TableRow>
                         </TableHeader>
                         <TableBody>
                         {newBookings.length > 0 ? newBookings.map((booking) => {
-                            console.log(`Processing booking ID ${booking.id}:`, booking); // LOG 2
-                            console.log(`Uploads property for booking ID ${booking.id}:`, booking.uploads); // LOG 3
-
                             const hasUploads = booking.uploads && booking.uploads.length > 0;
                             const uploadData = hasUploads ? booking.uploads[0] : null;
 
@@ -207,7 +202,7 @@ export default function AdminDashboard() {
                                     <TableCell>{!booking.driver_name ? 'Required' : 'Provided'}</TableCell>
                                     <TableCell>
                                         <div className="flex flex-col gap-1">
-                                            {uploadData ? (
+                                            {hasUploads ? (
                                                 <>
                                                     {uploadData.leave_form ? (
                                                         <a href={uploadData.leave_form} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline text-xs">Leave Form</a>
@@ -231,9 +226,6 @@ export default function AdminDashboard() {
                                         </div>
                                     </TableCell>
                                     <TableCell>
-                                        {uploadData ? uploadData.booking_id : 'N/A'}
-                                    </TableCell>
-                                    <TableCell>
                                         <div className="flex gap-2">
                                             <Button size="sm" onClick={() => handleCheckAvailability(booking.id)} disabled={isSubmitting === booking.id}>
                                                 {isSubmitting === booking.id && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -249,7 +241,7 @@ export default function AdminDashboard() {
                             );
                         }) : (
                             <TableRow>
-                                <TableCell colSpan={8} className="text-center">No new applications found.</TableCell>
+                                <TableCell colSpan={7} className="text-center">No new applications found.</TableCell>
                             </TableRow>
                         )}
                         </TableBody>
@@ -314,5 +306,3 @@ export default function AdminDashboard() {
     </div>
   )
 }
-
-    

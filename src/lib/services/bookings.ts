@@ -24,19 +24,39 @@ export async function bookingExists(userEmail) {
 }
 
 export async function getBookings() {
-  const { data, error } = await supabase
+  // Step 1: Fetch all bookings with status 'In Progress'
+  const { data: bookings, error: bookingsError } = await supabase
     .from('booking')
-    .select(`
-      *,
-      uploads (*)
-    `)
+    .select('*')
     .eq('status', 'In Progress');
 
-  if (error) {
-    console.error("Error fetching bookings with uploads:", error);
-    throw error;
+  if (bookingsError) {
+    console.error("Error fetching bookings:", bookingsError);
+    throw bookingsError;
   }
-  return data;
+
+  if (!bookings) return [];
+
+  // Step 2: For each booking, fetch its corresponding upload data
+  const bookingsWithUploads = await Promise.all(
+    bookings.map(async (booking) => {
+      const { data: uploads, error: uploadsError } = await supabase
+        .from('uploads')
+        .select('*')
+        .eq('booking_id', booking.id);
+      
+      if (uploadsError) {
+        console.error(`Error fetching uploads for booking ${booking.id}:`, uploadsError);
+        // Return the booking without uploads if the query fails
+        return { ...booking, uploads: [] };
+      }
+      
+      // Step 3: Combine the data
+      return { ...booking, uploads: uploads || [] };
+    })
+  );
+
+  return bookingsWithUploads;
 }
 
 export async function getOneBooking(bookingId) {
