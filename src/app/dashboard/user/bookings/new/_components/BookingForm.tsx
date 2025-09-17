@@ -79,19 +79,38 @@ const formSchema = z.object({
   departDateTime: z.date({ required_error: "A departure date is required." }),
   returnDateTime: z.date({ required_error: "A return date is required." }),
   tripDescription: z.string().optional(),
-}).refine(data => {
+}).superRefine((data, ctx) => {
     if (data.providesOwnDriver) {
-        return !!data.driverFirstName && !!data.driverSurname && !!data.driverStaffNo && !!data.driverMobile && !!data.driverJobType && !!data.driverLicenseIssue && !!data.driverLicenseExpiry;
+        if (!data.driverFirstName) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Driver's first name is required.", path: ["driverFirstName"] });
+        }
+        if (!data.driverSurname) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Driver's surname is required.", path: ["driverSurname"] });
+        }
+        if (!data.driverStaffNo) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Driver's staff number is required.", path: ["driverStaffNo"] });
+        }
+        if (!data.driverMobile) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Driver's mobile number is required.", path: ["driverMobile"] });
+        }
+        if (!data.driverJobType) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Driver's job type is required.", path: ["driverJobType"] });
+        }
+        if (!data.driverLicenseIssue) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: "License issue date is required.", path: ["driverLicenseIssue"] });
+        }
+        if (!data.driverLicenseExpiry) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: "License expiry date is required.", path: ["driverLicenseExpiry"] });
+        }
     }
-    return true;
-}, {
-    message: "All driver details must be filled out if you provide your own driver.",
-    path: ["providesOwnDriver"],
-}).refine(data => {
-    return data.returnDateTime > data.departDateTime;
-}, {
-    message: "Return date must be after the departure date.",
-    path: ["returnDateTime"],
+
+    if (data.departDateTime && data.returnDateTime && data.returnDateTime <= data.departDateTime) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Return date must be after the departure date.",
+            path: ["returnDateTime"],
+        });
+    }
 });
 
 export function BookingForm() {
@@ -300,23 +319,23 @@ export function BookingForm() {
                     <AccordionContent className="p-4 space-y-8">
                         <div className="grid md:grid-cols-2 gap-8">
                             <FormField control={form.control} name="driverFirstName" render={({ field }) => (
-                                <FormItem><FormLabel>Driver First Name *</FormLabel><FormControl><Input placeholder="Driver's first name" {...field} /></FormControl><FormMessage /></FormItem>
+                                <FormItem><FormLabel>Driver First Name</FormLabel><FormControl><Input placeholder="Driver's first name" {...field} /></FormControl><FormMessage /></FormItem>
                             )} />
                             <FormField control={form.control} name="driverSurname" render={({ field }) => (
-                                <FormItem><FormLabel>Driver Surname *</FormLabel><FormControl><Input placeholder="Driver's surname" {...field} /></FormControl><FormMessage /></FormItem>
+                                <FormItem><FormLabel>Driver Surname</FormLabel><FormControl><Input placeholder="Driver's surname" {...field} /></FormControl><FormMessage /></FormItem>
                             )} />
                         </div>
                         <div className="grid md:grid-cols-2 gap-8">
                             <FormField control={form.control} name="driverStaffNo" render={({ field }) => (
-                                <FormItem><FormLabel>Driver Staff No. *</FormLabel><FormControl><Input placeholder="Driver's staff number" {...field} /></FormControl><FormMessage /></FormItem>
+                                <FormItem><FormLabel>Driver Staff No.</FormLabel><FormControl><Input placeholder="Driver's staff number" {...field} /></FormControl><FormMessage /></FormItem>
                             )} />
                             <FormField control={form.control} name="driverMobile" render={({ field }) => (
-                                <FormItem><FormLabel>Driver Mobile No. *</FormLabel><FormControl><Input type="tel" placeholder="Driver's mobile" {...field} /></FormControl><FormMessage /></FormItem>
+                                <FormItem><FormLabel>Driver Mobile No.</FormLabel><FormControl><Input type="tel" placeholder="Driver's mobile" {...field} /></FormControl><FormMessage /></FormItem>
                             )} />
                         </div>
                         <FormField control={form.control} name="driverJobType" render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Driver Job Type *</FormLabel>
+                                <FormLabel>Driver Job Type</FormLabel>
                                 <Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select driver's job type" /></SelectTrigger></FormControl>
                                 <SelectContent>
                                     <SelectItem value="Permanent">Permanent</SelectItem>
@@ -328,10 +347,10 @@ export function BookingForm() {
                         )} />
                         <div className="grid md:grid-cols-2 gap-8">
                             <FormField control={form.control} name="driverLicenseIssue" render={({ field }) => (
-                                <FormItem className="flex flex-col"><FormLabel>License Issue Date *</FormLabel><Popover><PopoverTrigger asChild><FormControl><Button variant={"outline"} className={cn("w-full justify-start text-left font-normal", !field.value && "text-muted-foreground")}><CalendarIcon className="mr-2 h-4 w-4" />{field.value ? format(field.value, "PPP") : <span>Pick a date</span>}</Button></FormControl></PopoverTrigger><PopoverContent className="w-auto p-0"><Calendar mode="single" selected={field.value} onSelect={field.onChange} fromDate={new Date(1950, 0, 1)} toDate={new Date()} initialFocus /></PopoverContent></Popover><FormMessage /></FormItem>
+                                <FormItem className="flex flex-col"><FormLabel>License Issue Date</FormLabel><Popover><PopoverTrigger asChild><FormControl><Button variant={"outline"} className={cn("w-full justify-start text-left font-normal", !field.value && "text-muted-foreground")}><CalendarIcon className="mr-2 h-4 w-4" />{field.value ? format(field.value, "PPP") : <span>Pick a date</span>}</Button></FormControl></PopoverTrigger><PopoverContent className="w-auto p-0"><Calendar mode="single" selected={field.value} onSelect={field.onChange} fromDate={new Date(1950, 0, 1)} toDate={new Date()} initialFocus /></PopoverContent></Popover><FormMessage /></FormItem>
                             )} />
                             <FormField control={form.control} name="driverLicenseExpiry" render={({ field }) => (
-                                <FormItem className="flex flex-col"><FormLabel>License Expiry Date *</FormLabel><Popover><PopoverTrigger asChild><FormControl><Button variant={"outline"} className={cn("w-full justify-start text-left font-normal", !field.value && "text-muted-foreground")}><CalendarIcon className="mr-2 h-4 w-4" />{field.value ? format(field.value, "PPP") : <span>Pick a date</span>}</Button></FormControl></PopoverTrigger><PopoverContent className="w-auto p-0"><Calendar mode="single" selected={field.value} onSelect={field.onChange} fromDate={new Date()} initialFocus /></PopoverContent></Popover><FormMessage /></FormItem>
+                                <FormItem className="flex flex-col"><FormLabel>License Expiry Date</FormLabel><Popover><PopoverTrigger asChild><FormControl><Button variant={"outline"} className={cn("w-full justify-start text-left font-normal", !field.value && "text-muted-foreground")}><CalendarIcon className="mr-2 h-4 w-4" />{field.value ? format(field.value, "PPP") : <span>Pick a date</span>}</Button></FormControl></PopoverTrigger><PopoverContent className="w-auto p-0"><Calendar mode="single" selected={field.value} onSelect={field.onChange} fromDate={new Date()} initialFocus /></PopoverContent></Popover><FormMessage /></FormItem>
                             )} />
                         </div>
                     </AccordionContent>
