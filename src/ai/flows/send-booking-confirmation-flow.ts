@@ -9,6 +9,7 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 import { Resend } from 'resend';
+require('dotenv').config({ path: './.env.local' });
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 

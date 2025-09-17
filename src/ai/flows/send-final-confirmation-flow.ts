@@ -11,6 +11,7 @@ import {z} from 'genkit';
 import { Resend } from 'resend';
 import { updateBookingStatus } from '@/lib/services/bookings';
 import { updateVehicleStatus } from '@/lib/services/vehicles';
+require('dotenv').config({ path: './.env.local' });
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
