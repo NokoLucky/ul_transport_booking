@@ -1,13 +1,20 @@
+
+'use client';
+
 import { TopNav } from "@/components/dashboard/TopNav"
 import { UserNav } from "@/components/dashboard/UserNav"
 import { Bus } from 'lucide-react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const pathname = usePathname();
+  const isStaff = pathname.startsWith('/dashboard/admin') || pathname.startsWith('/dashboard/inspector');
+
   return (
       <div className="min-h-screen w-full flex flex-col">
           <header className="sticky top-0 z-40 flex h-14 items-center gap-4 border-b bg-background px-6">
@@ -19,7 +26,7 @@ export default function DashboardLayout({
             <TopNav />
             
             <div className="ml-auto flex items-center gap-4">
-                <UserNav />
+                {isStaff && <UserNav />}
             </div>
           </header>
           <main className="flex-1 p-4 sm:p-6 bg-muted/40">
