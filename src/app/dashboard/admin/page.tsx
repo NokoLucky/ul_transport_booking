@@ -180,6 +180,7 @@ export default function AdminDashboard() {
                             <TableHead>Vehicle</TableHead>
                             <TableHead>Driver</TableHead>
                             <TableHead>Files</TableHead>
+                            <TableHead>Upload Booking ID</TableHead> 
                             <TableHead>Actions</TableHead>
                         </TableRow>
                         </TableHeader>
@@ -230,6 +231,9 @@ export default function AdminDashboard() {
                                         </div>
                                     </TableCell>
                                     <TableCell>
+                                        {uploadData ? uploadData.booking_id : 'N/A'}
+                                    </TableCell>
+                                    <TableCell>
                                         <div className="flex gap-2">
                                             <Button size="sm" onClick={() => handleCheckAvailability(booking.id)} disabled={isSubmitting === booking.id}>
                                                 {isSubmitting === booking.id && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -245,7 +249,7 @@ export default function AdminDashboard() {
                             );
                         }) : (
                             <TableRow>
-                                <TableCell colSpan={7} className="text-center">No new applications found.</TableCell>
+                                <TableCell colSpan={8} className="text-center">No new applications found.</TableCell>
                             </TableRow>
                         )}
                         </TableBody>
@@ -310,3 +314,5 @@ export default function AdminDashboard() {
     </div>
   )
 }
+
+    
