@@ -41,7 +41,9 @@ export default function AdminDashboard() {
           getBookings(),
           getCompletedBookings()
         ]);
-        setNewBookings(newBookingsData || []);
+        const bookings = newBookingsData || [];
+        setNewBookings(bookings);
+        console.log("Fetched new bookings data:", bookings); // LOG 1: Log all fetched data
         setCompletedBookings(completedBookingsData || []);
         setError(null);
       } catch (err: any) {
@@ -179,58 +181,67 @@ export default function AdminDashboard() {
                         </TableRow>
                         </TableHeader>
                         <TableBody>
-                        {newBookings.length > 0 ? newBookings.map((booking) => (
-                            <TableRow key={booking.id}>
-                                <TableCell>
-                                    <div className="font-medium">{booking.user_name} {booking.user_surname}</div>
-                                    <div className="text-sm text-muted-foreground">Staff: {booking.user_staffno}</div>
-                                </TableCell>
-                                <TableCell>{booking.user_mobile}</TableCell>
-                                 <TableCell>
-                                    <div className="font-medium">{booking.department}</div>
-                                    <div className="text-sm text-muted-foreground">{booking.building} - {booking.officeno}</div>
-                                </TableCell>
-                                <TableCell>{booking.car_type}</TableCell>
-                                <TableCell>{!booking.driver_name ? 'Required' : 'Provided'}</TableCell>
-                                <TableCell>
-                                    <div className="flex flex-col gap-1">
-                                        {booking.uploads && booking.uploads.length > 0 ? (
-                                            <>
-                                                {booking.uploads[0]?.leave_form ? (
-                                                    <a href={booking.uploads[0].leave_form} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline text-xs">Leave Form</a>
-                                                ) : (
-                                                    <span className="text-xs text-muted-foreground">No Leave Form</span>
-                                                )}
-                                                {booking.uploads[0]?.passengers ? (
-                                                    <a href={booking.uploads[0].passengers} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline text-xs">Passengers List</a>
-                                                ) : (
-                                                    <span className="text-xs text-muted-foreground">No Passengers List</span>
-                                                )}
-                                                {booking.uploads[0]?.drivers ? (
-                                                    <a href={booking.uploads[0].drivers} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline text-xs">Driver's License</a>
-                                                ) : (
-                                                    <span className="text-xs text-muted-foreground">No Driver's License</span>
-                                                )}
-                                            </>
-                                        ) : (
-                                            <span className="text-xs text-muted-foreground">No files uploaded</span>
-                                        )}
-                                    </div>
-                                </TableCell>
-                                <TableCell>
-                                    <div className="flex gap-2">
-                                        <Button size="sm" onClick={() => handleCheckAvailability(booking.id)} disabled={isSubmitting === booking.id}>
-                                            {isSubmitting === booking.id && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                            Check Availability
-                                        </Button>
-                                        <Button size="sm" variant="destructive" onClick={() => handleReject(booking.id)} disabled={isSubmitting === booking.id}>
-                                            {isSubmitting === booking.id && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                            Reject
-                                        </Button>
-                                    </div>
-                                </TableCell>
-                            </TableRow>
-                        )) : (
+                        {newBookings.length > 0 ? newBookings.map((booking) => {
+                            // LOG 2: Log each booking object inside the map
+                            console.log(`Processing booking ID ${booking.id}:`, booking);
+                            console.log(`Uploads property for booking ID ${booking.id}:`, booking.uploads);
+
+                            const hasUploads = booking.uploads && booking.uploads.length > 0;
+                            const uploadData = hasUploads ? booking.uploads[0] : null;
+
+                            return (
+                                <TableRow key={booking.id}>
+                                    <TableCell>
+                                        <div className="font-medium">{booking.user_name} {booking.user_surname}</div>
+                                        <div className="text-sm text-muted-foreground">Staff: {booking.user_staffno}</div>
+                                    </TableCell>
+                                    <TableCell>{booking.user_mobile}</TableCell>
+                                    <TableCell>
+                                        <div className="font-medium">{booking.department}</div>
+                                        <div className="text-sm text-muted-foreground">{booking.building} - {booking.officeno}</div>
+                                    </TableCell>
+                                    <TableCell>{booking.car_type}</TableCell>
+                                    <TableCell>{!booking.driver_name ? 'Required' : 'Provided'}</TableCell>
+                                    <TableCell>
+                                        <div className="flex flex-col gap-1">
+                                            {hasUploads && uploadData ? (
+                                                <>
+                                                    {uploadData.leave_form ? (
+                                                        <a href={uploadData.leave_form} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline text-xs">Leave Form</a>
+                                                    ) : (
+                                                        <span className="text-xs text-muted-foreground">No Leave Form</span>
+                                                    )}
+                                                    {uploadData.passengers ? (
+                                                        <a href={uploadData.passengers} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline text-xs">Passengers List</a>
+                                                    ) : (
+                                                        <span className="text-xs text-muted-foreground">No Passengers List</span>
+                                                    )}
+                                                    {uploadData.drivers ? (
+                                                        <a href={uploadData.drivers} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline text-xs">Driver's License</a>
+                                                    ) : (
+                                                        <span className="text-xs text-muted-foreground">No Driver's License</span>
+                                                    )}
+                                                </>
+                                            ) : (
+                                                <span className="text-xs text-muted-foreground">No files uploaded</span>
+                                            )}
+                                        </div>
+                                    </TableCell>
+                                    <TableCell>
+                                        <div className="flex gap-2">
+                                            <Button size="sm" onClick={() => handleCheckAvailability(booking.id)} disabled={isSubmitting === booking.id}>
+                                                {isSubmitting === booking.id && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                                Check Availability
+                                            </Button>
+                                            <Button size="sm" variant="destructive" onClick={() => handleReject(booking.id)} disabled={isSubmitting === booking.id}>
+                                                {isSubmitting === booking.id && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                                Reject
+                                            </Button>
+                                        </div>
+                                    </TableCell>
+                                </TableRow>
+                            );
+                        }) : (
                             <TableRow>
                                 <TableCell colSpan={7} className="text-center">No new applications found.</TableCell>
                             </TableRow>
@@ -297,3 +308,5 @@ export default function AdminDashboard() {
     </div>
   )
 }
+
+  
