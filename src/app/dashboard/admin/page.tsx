@@ -196,17 +196,17 @@ export default function AdminDashboard() {
                                     <div className="flex flex-col gap-1">
                                         {booking.uploads && booking.uploads.length > 0 ? (
                                             <>
-                                                {booking.uploads[0].leave_form ? (
+                                                {booking.uploads[0]?.leave_form ? (
                                                     <a href={booking.uploads[0].leave_form} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline text-xs">Leave Form</a>
                                                 ) : (
                                                     <span className="text-xs text-muted-foreground">No Leave Form</span>
                                                 )}
-                                                {booking.uploads[0].passengers ? (
+                                                {booking.uploads[0]?.passengers ? (
                                                     <a href={booking.uploads[0].passengers} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline text-xs">Passengers List</a>
                                                 ) : (
                                                     <span className="text-xs text-muted-foreground">No Passengers List</span>
                                                 )}
-                                                {booking.uploads[0].drivers ? (
+                                                {booking.uploads[0]?.drivers ? (
                                                     <a href={booking.uploads[0].drivers} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline text-xs">Driver's License</a>
                                                 ) : (
                                                     <span className="text-xs text-muted-foreground">No Driver's License</span>
