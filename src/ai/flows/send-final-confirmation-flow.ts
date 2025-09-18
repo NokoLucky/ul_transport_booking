@@ -42,7 +42,6 @@ export const sendFinalConfirmationFlow = ai.defineFlow(
   },
   async (input) => {
 
-    const testEmailRecipient = 'smallz.breezy@gmail.com'; // HARDCODED FOR TESTING
     const completeTripUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:9002'}/complete-trip/${input.allocationId}`;
     
     // 1. Generate and send email to the client
@@ -61,10 +60,10 @@ export const sendFinalConfirmationFlow = ai.defineFlow(
     console.log("Client email content generated:\n", clientEmailBody);
 
     try {
-        console.log(`Attempting to send client confirmation to ${testEmailRecipient} (Original: ${input.clientEmail})`);
+        console.log(`Attempting to send client confirmation to ${input.clientEmail}`);
         const { data, error } = await resend.emails.send({
             from: 'UL Transport <onboarding@resend.dev>',
-            to: testEmailRecipient, // ALWAYS SEND TO YOUR VERIFIED EMAIL FOR TESTING
+            to: input.clientEmail,
             subject: 'Booking Approved',
             html: clientEmailBody
         });
@@ -75,7 +74,7 @@ export const sendFinalConfirmationFlow = ai.defineFlow(
         }
 
         console.log("Resend API success response (client email):", data);
-        console.log(`Client confirmation email sent successfully to ${testEmailRecipient}`);
+        console.log(`Client confirmation email sent successfully to ${input.clientEmail}`);
 
     } catch (error) {
         console.error(`Failed to send client email to ${input.clientEmail}`, error);
@@ -91,10 +90,10 @@ export const sendFinalConfirmationFlow = ai.defineFlow(
 
         console.log("Driver email content generated:\n", driverEmailBody);
         try {
-            console.log(`Attempting to send driver confirmation to ${testEmailRecipient} (Original: ${input.driver.email})`);
+            console.log(`Attempting to send driver confirmation to ${input.driver.email}`);
             const { data, error } = await resend.emails.send({
                 from: 'UL Transport <onboarding@resend.dev>',
-                to: testEmailRecipient, // ALWAYS SEND TO YOUR VERIFIED EMAIL FOR TESTING
+                to: input.driver.email,
                 subject: 'New Trip Assigned',
                 html: driverEmailBody
             });
@@ -105,7 +104,7 @@ export const sendFinalConfirmationFlow = ai.defineFlow(
             }
 
             console.log("Resend API success response (driver email):", data);
-            console.log(`Driver confirmation email sent successfully to ${testEmailRecipient}`);
+            console.log(`Driver confirmation email sent successfully to ${input.driver.email}`);
         } catch (error) {
             console.error(`Failed to send driver email to ${input.driver.email}`, error);
             // Re-throw the error to ensure the flow fails and reports it to the client.
