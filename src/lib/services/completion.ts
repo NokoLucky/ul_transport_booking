@@ -1,3 +1,4 @@
+
 import { getSupabaseClient } from '@/lib/supabase/client';
 
 const supabase = getSupabaseClient();
@@ -7,8 +8,8 @@ export async function getCompletedBookings() {
         .from('allocates')
         .select(`
             *,
-            booking:booking (*, uploads:uploads(*)),
-            drivers:drivers (*)
+            booking:booking(*, uploads(*)),
+            drivers:drivers(*)
         `)
         .eq('action', 'Check Out')
         .eq('booking.status', 'Awaiting Admin Approval');
