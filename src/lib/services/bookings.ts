@@ -24,50 +24,16 @@ export async function bookingExists(userEmail) {
 }
 
 export async function getBookings() {
-  // Step 1: Fetch all bookings with status 'In Progress'
-  const { data: bookings, error: bookingsError } = await supabase
+  const { data, error } = await supabase
     .from('booking')
-    .select('*')
+    .select('*, uploads (*)')
     .eq('status', 'In Progress');
 
-  if (bookingsError) {
-    console.error("Error fetching bookings:", bookingsError);
-    throw bookingsError;
+  if (error) {
+    console.error("Error fetching bookings:", error);
+    throw error;
   }
-
-  if (!bookings || bookings.length === 0) return [];
-
-  // Step 2: Get all booking IDs
-  const bookingIds = bookings.map(booking => booking.id);
-
-  // Step 3: Fetch all uploads for those booking IDs in a single query
-  const { data: uploads, error: uploadsError } = await supabase
-    .from('uploads')
-    .select('*')
-    .in('booking_id', bookingIds);
-
-  if (uploadsError) {
-    console.error("Error fetching uploads:", uploadsError);
-    throw uploadsError;
-  }
-
-  // Step 4: Create a map of uploads by booking_id for easy lookup
-  const uploadsMap = new Map();
-  if (uploads) {
-    for (const upload of uploads) {
-        uploadsMap.set(upload.booking_id, upload);
-    }
-  }
-
-  // Step 5: Combine the bookings with their corresponding uploads
-  const bookingsWithUploads = bookings.map(booking => {
-    return {
-      ...booking,
-      uploads: uploadsMap.get(booking.id) || null
-    };
-  });
-
-  return bookingsWithUploads;
+  return data || [];
 }
 
 export async function getOneBooking(bookingId) {
@@ -129,5 +95,3 @@ export async function deleteBooking(bookingId) {
 
     if (error) throw error;
 }
-
-    
