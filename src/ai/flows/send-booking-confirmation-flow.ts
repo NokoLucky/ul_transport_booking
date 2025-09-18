@@ -13,6 +13,10 @@ require('dotenv').config({ path: './.env.local' });
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+// Define a hardcoded email for testing in a sandbox environment.
+// Replace this with your actual Resend-verified email address.
+const SANDBOX_TEST_EMAIL = "your-verified-email@example.com";
+
 const SendBookingConfirmationInputSchema = z.object({
   name: z.string().describe('The name of the user who made the booking.'),
   reference: z.string().describe('The booking reference number.'),
@@ -36,10 +40,16 @@ export const sendBookingConfirmationFlow = ai.defineFlow(
     console.log("Email content generated:\n", emailBody);
 
     try {
-        console.log(`Attempting to send booking confirmation to ${input.email}`);
+        // In a sandbox environment, Resend only allows sending to verified emails.
+        // We will send all emails to a single verified address for testing.
+        const recipientEmail = process.env.NODE_ENV === 'production' 
+            ? SANDBOX_TEST_EMAIL // Use the hardcoded email on Vercel (production env) until domain is verified
+            : input.email;      // Use the actual email in local dev (if you've verified it)
+
+        console.log(`Attempting to send booking confirmation to ${recipientEmail}`);
         const { data, error } = await resend.emails.send({
             from: 'UL Transport <onboarding@resend.dev>',
-            to: input.email,
+            to: recipientEmail, // Changed from input.email
             subject: 'Booking Confirmation',
             html: emailBody,
         });
@@ -50,7 +60,7 @@ export const sendBookingConfirmationFlow = ai.defineFlow(
         }
 
         console.log("Resend API success response:", data);
-        console.log(`Booking confirmation email sent successfully to ${input.email}`);
+        console.log(`Booking confirmation email sent successfully to ${recipientEmail}`);
     } catch (error) {
         console.error("Failed to send booking confirmation email:", error);
         // Re-throw the error to ensure the flow fails and reports it to the client.
